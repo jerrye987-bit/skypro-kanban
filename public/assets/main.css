@@ -977,6 +977,21 @@ body {
     justify-content: stretch;
     padding: 15px 13px 19px;
   }
+  .btn-primary {
+    position: fixed;
+    bottom: 29px;
+    left: 16px;
+    right: 16px;
+    width: calc(100% - 32px);
+    height: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 999;
+  }
+  .header {
+    padding: 27 20 27 0;
+  }
+
 }
 @media screen and (max-width: 660px) {
   .pop-new-card {
