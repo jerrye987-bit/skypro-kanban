@@ -1,9 +1,0 @@
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Разносит логотип влево, а кнопки — вправо */
-  padding: 28px 135px 25px 130px;
-  background-color: #ffffff;      /* Чистый белый фон */
-  border-bottom: 1px solid #eaeaea; /* Тонкая серая полоса снизу */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02); /* Легкая, почти незаметная тень */
-}
