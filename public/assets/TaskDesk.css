@@ -1,0 +1,9 @@
+.task-desk__grid {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 40px 135px 40px 129px;
+  overflow-x: auto;
+  background: #EAEEF6;
+;
+}
