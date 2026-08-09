@@ -26,7 +26,6 @@ onMounted(() => {
 watch(
   () => route.hash,
   (newHash) => {
-    console.log('Текущий хэш изменился на:', newHash)
     if (newHash === '#popExit') {
       isProfileOpen.value = true
     } else {
