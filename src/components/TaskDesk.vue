@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { initialTasks } from '@/mocks/tasks.js'
 
@@ -14,6 +14,14 @@ const tasks = ref(initialTasks)
 const route = useRoute()
 const router = useRouter()
 const isProfileOpen = ref(false)
+
+const isLoading = ref(true)
+
+onMounted(() => {
+  setTimeout(() => {
+    isLoading.value = false
+  }, 3000)
+})
 
 watch(
   () => route.hash,
@@ -44,8 +52,15 @@ const getThemeClass = (topic) => {
   <div class="task-desk">
     <BaseHeader />
 
+    <div v-if="isLoading" class="task-desk__loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div> <!-- Простой анимированный крутилка -->
+        <p>Данные загружаются...</p>
+      </div>
+    </div>
+
     <!-- Сетка колонок проекта -->
-    <main class="task-desk__grid">
+    <main v-else class="task-desk__grid">
 
       <!-- 1. КОЛОНКА: БЕЗ СТАТУСА -->
       <TaskColumn>
