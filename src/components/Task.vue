@@ -11,7 +11,7 @@
             <p class="_orange">Web Design</p>
           </div>
         </slot>
-        <a href="#popBrowse" target="_self">
+        <a href="#popBrowse" target="_self" @click.prevent>
           <div class="card__btn">
             <div></div>
             <div></div>
@@ -21,7 +21,9 @@
       </div>
       <div class="card__content">
         <a href="" target="_blank">
-          <h3 class="card__title">Название задачи</h3>
+          <slot name="title">
+            <h3 class="card__title">Название задачи</h3>
+          </slot>
         </a>
         <div class="card__date">
           <svg

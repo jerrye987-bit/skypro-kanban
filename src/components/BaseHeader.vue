@@ -5,11 +5,15 @@
     </div>
     <nav class="header__nav">
       <button class="btn-primary">Создать новую задачу</button>
-      <button class="btn-secondary">Выйти</button>
+      <button class="btn-secondary">
+        <a href="#popExit">Ivan Ivanov</a>
+      </button>
     </nav>
   </header>
 </template>
 
-<script setup></script>
+<script setup>
+  defineEmits(['open-profile'])
+</script>
 
 <style lang="scss" scoped></style>
