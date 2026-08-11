@@ -1,19 +1,17 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
 import { initialTasks } from '@/mocks/tasks.js'
 
 import BaseHeader from '@/components/BaseHeader.vue'
 import TaskColumn from '@/components/TaskColumn.vue'
-// import TaskModal from '@/components/TaskModal.vue'
-// import NewCardModal from '@/components/NewCardModal.vue'
-import ExitModal from '@/components/ExitModal.vue'
 import Task from '@/components/Task.vue'
 
 const tasks = ref(initialTasks)
-const route = useRoute()
-const router = useRouter()
-const isProfileOpen = ref(false)
+
+const currentUser = ref({
+  name: 'Ivan Ivanov',
+  email: 'ivan.ivanov@gmail.com'
+})
 
 const isLoading = ref(true)
 
@@ -22,22 +20,6 @@ onMounted(() => {
     isLoading.value = false
   }, 3000)
 })
-
-watch(
-  () => route.hash,
-  (newHash) => {
-    if (newHash === '#popExit') {
-      isProfileOpen.value = true
-    } else {
-      isProfileOpen.value = false
-    }
-  },
-  { immediate: true }
-)
-
-const closeAllModals = () => {
-  router.push('/')
-}
 
 const getThemeClass = (topic) => {
   if (topic === 'Web Design') return '_orange'
@@ -49,26 +31,23 @@ const getThemeClass = (topic) => {
 
 <template>
   <div class="task-desk">
-    <BaseHeader />
+    <BaseHeader :user="currentUser" />
 
     <div v-if="isLoading" class="task-desk__loader">
       <div class="loader-content">
-        <div class="loader-spinner"></div> <!-- Простой анимированный крутилка -->
+        <div class="loader-spinner"></div>
+        <!-- Простой анимированный крутилка -->
         <p>Данные загружаются...</p>
       </div>
     </div>
 
     <!-- Сетка колонок проекта -->
     <main v-else class="task-desk__grid">
-
       <!-- 1. КОЛОНКА: БЕЗ СТАТУСА -->
       <TaskColumn>
         <template #title>БЕЗ СТАТУСА</template>
         <template #content>
-          <Task
-            v-for="task in tasks.filter(t => t.status === 'Без статуса')"
-            :key="task.id"
-          >
+          <Task v-for="task in tasks.filter((t) => t.status === 'Без статуса')" :key="task.id">
             <template #theme>
               <div class="card__theme" :class="getThemeClass(task.topic)">
                 <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
@@ -86,10 +65,7 @@ const getThemeClass = (topic) => {
       <TaskColumn>
         <template #title>НУЖНО СДЕЛАТЬ</template>
         <template #content>
-          <Task
-            v-for="task in tasks.filter(t => t.status === 'Нужно сделать')"
-            :key="task.id"
-          >
+          <Task v-for="task in tasks.filter((t) => t.status === 'Нужно сделать')" :key="task.id">
             <template #theme>
               <div class="card__theme" :class="getThemeClass(task.topic)">
                 <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
@@ -107,10 +83,7 @@ const getThemeClass = (topic) => {
       <TaskColumn>
         <template #title>В РАБОТЕ</template>
         <template #content>
-          <Task
-            v-for="task in tasks.filter(t => t.status === 'В работе')"
-            :key="task.id"
-          >
+          <Task v-for="task in tasks.filter((t) => t.status === 'В работе')" :key="task.id">
             <template #theme>
               <div class="card__theme" :class="getThemeClass(task.topic)">
                 <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
@@ -128,10 +101,7 @@ const getThemeClass = (topic) => {
       <TaskColumn>
         <template #title>ТЕСТИРОВАНИЕ</template>
         <template #content>
-          <Task
-            v-for="task in tasks.filter(t => t.status === 'Тестирование')"
-            :key="task.id"
-          >
+          <Task v-for="task in tasks.filter((t) => t.status === 'Тестирование')" :key="task.id">
             <template #theme>
               <div class="card__theme" :class="getThemeClass(task.topic)">
                 <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
@@ -149,10 +119,7 @@ const getThemeClass = (topic) => {
       <TaskColumn>
         <template #title>ГОТОВО</template>
         <template #content>
-          <Task
-            v-for="task in tasks.filter(t => t.status === 'Готово')"
-            :key="task.id"
-          >
+          <Task v-for="task in tasks.filter((t) => t.status === 'Готово')" :key="task.id">
             <template #theme>
               <div class="card__theme" :class="getThemeClass(task.topic)">
                 <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
@@ -165,10 +132,6 @@ const getThemeClass = (topic) => {
           </Task>
         </template>
       </TaskColumn>
-
     </main>
-
-    <!-- Подключаемые модальные окна -->
-    <ExitModal v-if="isProfileOpen" @close="closeAllModals" />
   </div>
 </template>
