@@ -5,5 +5,41 @@
   padding: 40px 135px 40px 129px;
   overflow-x: auto;
   background: #EAEEF6;
-;
+}
+
+.task-desk__loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  min-height: calc(100vh - 80px);
+  background-color: var(--bg-desk, #EAEEF6);
+}
+
+.loader-content p {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-secondary, #94A6BE);
+  margin: 0;
+  letter-spacing: 0.5px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color, #EAEAEA);
+  border-top: 4px solid #565EEF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
