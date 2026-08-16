@@ -14,23 +14,49 @@
 </template>
 
 <script setup>
-  import { useRouter } from 'vue-router'
-  import ExitModal from '@/components/ExitModal.vue'
+import { useRouter } from 'vue-router'
+import ExitModal from '@/components/ExitModal.vue'
 
-  defineProps({
+defineProps({
   user: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
-  const router = useRouter()
+const router = useRouter()
 
-  const closeModal = () => {
-    router.push('/') // Очищаем хэш при закрытии
-  }
+const closeModal = () => {
+  router.push('/') // Очищаем хэш при закрытии
+}
 
-  defineEmits(['open-profile'])
+defineEmits(['open-profile'])
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .btn-primary {
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 14px;
+    line-height: 10px;
+    letter-spacing: 0%;
+    text-align: center;
+    background: #565EEF;
+    padding: 10px 14px;
+    border-radius: 4px;
+    color: #FFFFFF;
+  }
+  
+  .btn-secondary {
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+      line-height: 10px;
+      letter-spacing: 0%;
+      text-align: center;
+      background: #FFFFFF;
+      padding: 10px 20px;
+      border-radius: 4px;
+      color: #565EEF;
+  }
+</style>

@@ -18,12 +18,21 @@
         >
           &times;
         </button>
+
         <p class="pop-user-set__name">{{ user.name }}</p>
         <p class="pop-user-set__mail">{{ user.email }}</p>
+
         <div class="pop-user-set__theme">
           <p>Темная тема</p>
-          <input type="checkbox" class="checkbox" name="checkbox" />
+          <input
+            :checked="isDark"
+            @change="toggleTheme"
+            type="checkbox"
+            class="checkbox"
+            name="checkbox"
+          />
         </div>
+
         <div class="pop-exit__form-group">
           <button type="button" class="pop-exit__exit-yes">
             <a href="#" @click.prevent="$emit('close')">Выйти</a>
@@ -35,14 +44,18 @@
 </template>
 
 <script setup>
-defineProps({
-  user: {
-    type: Object,
-    required: true
-  }
-})
+  import { useTheme } from '@/composables/useTheme.js'
 
-defineEmits(['close'])
+  defineProps({
+    user: {
+      type: Object,
+      required: true,
+    },
+  })
+
+  defineEmits(['close'])
+
+  const { isDark, toggleTheme } = useTheme()
 </script>
 
 <style lang="scss" scoped></style>

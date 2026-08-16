@@ -1,32 +1,36 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { initialTasks } from '@/mocks/tasks.js'
+  import { ref, onMounted } from 'vue'
+  import { initialTasks } from '@/mocks/tasks.js'
+  import { useTheme } from '@/composables/useTheme.js'
 
-import BaseHeader from '@/components/BaseHeader.vue'
-import TaskColumn from '@/components/TaskColumn.vue'
-import Task from '@/components/Task.vue'
+  import BaseHeader from '@/components/BaseHeader.vue'
+  import TaskColumn from '@/components/TaskColumn.vue'
+  import Task from '@/components/Task.vue'
 
-const tasks = ref(initialTasks)
+  const tasks = ref(initialTasks)
 
-const currentUser = ref({
-  name: 'Ivan Ivanov',
-  email: 'ivan.ivanov@gmail.com'
-})
+  const currentUser = ref({
+    name: 'Ivan Ivanov',
+    email: 'ivan.ivanov@gmail.com',
+  })
 
-const isLoading = ref(true)
+  const isLoading = ref(true)
+  const { initTheme } = useTheme()
 
-onMounted(() => {
-  setTimeout(() => {
-    isLoading.value = false
-  }, 3000)
-})
+  onMounted(() => {
+    initTheme()
 
-const getThemeClass = (topic) => {
-  if (topic === 'Web Design') return '_orange'
-  if (topic === 'Research') return '_green'
-  if (topic === 'Copywriting') return '_purple'
-  return '_orange'
-}
+    setTimeout(() => {
+      isLoading.value = false
+    }, 3000)
+  })
+
+  const getThemeClass = (topic) => {
+    if (topic === 'Web Design') return '_orange'
+    if (topic === 'Research') return '_green'
+    if (topic === 'Copywriting') return '_purple'
+    return '_orange'
+  }
 </script>
 
 <template>
@@ -135,3 +139,52 @@ const getThemeClass = (topic) => {
     </main>
   </div>
 </template>
+
+<style lang="scss" scoped>
+  .task-desk__grid {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 40px 135px 40px 129px;
+  overflow-x: auto;
+  background: #EAEEF6;
+}
+
+.task-desk__loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  min-height: calc(100vh - 80px);
+  background-color: var(--bg-desk, #EAEEF6);
+}
+
+.loader-content p {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-secondary, #94A6BE);
+  margin: 0;
+  letter-spacing: 0.5px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color, #EAEAEA);
+  border-top: 4px solid #565EEF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+</style>
+
