@@ -1,3 +1,7 @@
+// Массив для сценария "Задач нет"
+// export const initialTasks = []
+
+// Массив с задачами
 export const initialTasks = [
   {
     id: 1,
