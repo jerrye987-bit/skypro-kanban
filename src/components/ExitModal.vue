@@ -44,18 +44,18 @@
 </template>
 
 <script setup>
-  import { useTheme } from '@/composables/useTheme.js'
+import { useTheme } from '@/composables/useTheme.js'
 
-  defineProps({
-    user: {
-      type: Object,
-      required: true,
-    },
-  })
+defineProps({
+  user: {
+    type: Object,
+    required: true,
+  },
+})
 
-  defineEmits(['close'])
+defineEmits(['close'])
 
-  const { isDark, toggleTheme } = useTheme()
+const { isDark, toggleTheme } = useTheme()
 </script>
 
 <style lang="scss" scoped></style>

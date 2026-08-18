@@ -2,7 +2,6 @@
   <!-- Используем те же классы-оболочки, что и у настоящей карточки Task.vue -->
   <div class="cards__item">
     <div class="cards__card card skeleton-pulse">
-
       <div class="card__group">
         <div class="skeleton-block badge"></div>
         <div class="skeleton-block dots"></div>
@@ -16,14 +15,11 @@
           <div class="skeleton-block date-box"></div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
-<script setup>
-
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .skeleton-pulse {
@@ -32,7 +28,7 @@
 }
 
 .skeleton-block {
-  background-color: #EAEEF6;
+  background-color: #eaeef6;
   border-radius: 4px;
   display: inline-block;
 
@@ -54,8 +50,12 @@
     margin-bottom: 4px;
     display: block;
 
-    &.main { width: 100%; }
-    &.short { width: 60%; }
+    &.main {
+      width: 100%;
+    }
+    &.short {
+      width: 60%;
+    }
   }
 
   &.date-box {
@@ -66,7 +66,12 @@
 }
 
 @keyframes skeleton-blink {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 </style>

@@ -4,7 +4,9 @@
       <img src="/assets/images/logo.png" alt="Логотип" class="header__logo-img" />
     </div>
     <nav class="header__nav">
-      <button class="btn-primary">Создать новую задачу</button>
+      <a href="#popNewCard" class="btn-primary-link">
+        <button class="btn-primary">Создать новую задачу</button>
+      </a>
       <button class="btn-secondary">
         <a href="#popExit">{{ user.name }}</a>
       </button>
@@ -34,29 +36,29 @@ defineEmits(['open-profile'])
 </script>
 
 <style lang="scss" scoped>
-  .btn-primary {
-    font-weight: 500;
-    font-style: Medium;
-    font-size: 14px;
-    line-height: 10px;
-    letter-spacing: 0%;
-    text-align: center;
-    background: #565EEF;
-    padding: 10px 14px;
-    border-radius: 4px;
-    color: #FFFFFF;
-  }
-  
-  .btn-secondary {
-      font-weight: 500;
-      font-style: Medium;
-      font-size: 14px;
-      line-height: 10px;
-      letter-spacing: 0%;
-      text-align: center;
-      background: #FFFFFF;
-      padding: 10px 20px;
-      border-radius: 4px;
-      color: #565EEF;
-  }
+.btn-primary {
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 14px;
+  line-height: 10px;
+  letter-spacing: 0%;
+  text-align: center;
+  background: #565eef;
+  padding: 10px 14px;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.btn-secondary {
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 14px;
+  line-height: 10px;
+  letter-spacing: 0%;
+  text-align: center;
+  background: #ffffff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  color: #565eef;
+}
 </style>
