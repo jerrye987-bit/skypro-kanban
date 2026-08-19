@@ -9,19 +9,27 @@ import TaskColumn from '@/components/TaskColumn.vue'
 import Task from '@/components/Task.vue'
 import TaskSkeleton from '@/components/TaskSkeleton.vue'
 import NewCardModal from '@/components/NewCardModal.vue'
+import TaskModal from '@/components/TaskModal.vue'
 
 const tasks = ref(initialTasks)
 
 const route = useRoute()
 const router = useRouter()
 const isNewCardOpen = ref(false)
+const isBrowseOpen = ref(false)
+const selectedTask = ref(null)
 
 watch(
   () => route.hash,
   (newHash) => {
     isNewCardOpen.value = newHash === '#popNewCard'
+    isBrowseOpen.value = newHash === '#popBrowseCard'
+
+    if (newHash !== '#popBrowseCard') {
+      selectedTask.value = null
+    }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const closeModals = () => {
@@ -30,11 +38,11 @@ const closeModals = () => {
 
 const handleAddTask = (newTaskData) => {
   const newTask = {
-    id: tasks.value.length ? Math.max(...tasks.value.map(t => t.id)) + 1 : 1,
+    id: tasks.value.length ? Math.max(...tasks.value.map((t) => t.id)) + 1 : 1,
     topic: newTaskData.topic || 'Web Design',
     title: newTaskData.title || 'Новая задача',
     date: newTaskData.date || new Date().toLocaleDateString('ru-RU'),
-    status: 'Без статуса'
+    status: 'Без статуса',
   }
 
   tasks.value.push(newTask)
@@ -57,11 +65,12 @@ onMounted(() => {
   }, 3000)
 })
 
-const getThemeClass = (topic) => {
-  if (topic === 'Web Design') return '_orange'
-  if (topic === 'Research') return '_green'
-  if (topic === 'Copywriting') return '_purple'
-  return '_orange'
+const openTaskModal = (id) => {
+  selectedTask.value = tasks.value.find((t) => t.id === id)
+
+  if (selectedTask.value) {
+    router.push({ hash: '#popBrowseCard' })
+  }
 }
 </script>
 
@@ -87,22 +96,17 @@ const getThemeClass = (topic) => {
         <TaskColumn>
           <template #title>БЕЗ СТАТУСА</template>
           <template #content>
-            <!-- Исправлено: добавили v-if для скелетонов и v-else для карточек -->
             <template v-if="isLoading">
               <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
             </template>
             <template v-else>
-              <Task v-for="task in tasks.filter((t) => t.status === 'Без статуса')" :key="task.id">
-                <template #theme>
-                  <div class="card__theme" :class="getThemeClass(task.topic)">
-                    <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
-                  </div>
-                </template>
-                <template #title
-                  ><h3 class="card__title">{{ task.title }}</h3></template
-                >
-                <template #date>{{ task.date }}</template>
-              </Task>
+              <!-- Передаем объект задачи целиком в проп :task и слушаем событие @open-task -->
+              <Task
+                v-for="task in tasks.filter((t) => t.status === 'Без статуса')"
+                :key="task.id"
+                :task="task"
+                @open-task="openTaskModal"
+              />
             </template>
           </template>
         </TaskColumn>
@@ -112,23 +116,15 @@ const getThemeClass = (topic) => {
           <template #title>НУЖНО СДЕЛАТЬ</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 1" :key="'sk2-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
             </template>
             <template v-else>
               <Task
                 v-for="task in tasks.filter((t) => t.status === 'Нужно сделать')"
                 :key="task.id"
-              >
-                <template #theme>
-                  <div class="card__theme" :class="getThemeClass(task.topic)">
-                    <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
-                  </div>
-                </template>
-                <template #title
-                  ><h3 class="card__title">{{ task.title }}</h3></template
-                >
-                <template #date>{{ task.date }}</template>
-              </Task>
+                :task="task"
+                @open-task="openTaskModal"
+              />
             </template>
           </template>
         </TaskColumn>
@@ -138,20 +134,15 @@ const getThemeClass = (topic) => {
           <template #title>В РАБОТЕ</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 3" :key="'sk3-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
             </template>
             <template v-else>
-              <Task v-for="task in tasks.filter((t) => t.status === 'В работе')" :key="task.id">
-                <template #theme>
-                  <div class="card__theme" :class="getThemeClass(task.topic)">
-                    <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
-                  </div>
-                </template>
-                <template #title
-                  ><h3 class="card__title">{{ task.title }}</h3></template
-                >
-                <template #date>{{ task.date }}</template>
-              </Task>
+              <Task
+                v-for="task in tasks.filter((t) => t.status === 'В работе')"
+                :key="task.id"
+                :task="task"
+                @open-task="openTaskModal"
+              />
             </template>
           </template>
         </TaskColumn>
@@ -161,20 +152,15 @@ const getThemeClass = (topic) => {
           <template #title>ТЕСТИРОВАНИЕ</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 2" :key="'sk4-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
             </template>
             <template v-else>
-              <Task v-for="task in tasks.filter((t) => t.status === 'Тестирование')" :key="task.id">
-                <template #theme>
-                  <div class="card__theme" :class="getThemeClass(task.topic)">
-                    <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
-                  </div>
-                </template>
-                <template #title
-                  ><h3 class="card__title">{{ task.title }}</h3></template
-                >
-                <template #date>{{ task.date }}</template>
-              </Task>
+              <Task
+                v-for="task in tasks.filter((t) => t.status === 'Тестирование')"
+                :key="task.id"
+                :task="task"
+                @open-task="openTaskModal"
+              />
             </template>
           </template>
         </TaskColumn>
@@ -184,36 +170,31 @@ const getThemeClass = (topic) => {
           <template #title>ГОТОВО</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 4" :key="'sk5-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
             </template>
             <template v-else>
-              <Task v-for="task in tasks.filter((t) => t.status === 'Готово')" :key="task.id">
-                <template #theme>
-                  <div class="card__theme" :class="getThemeClass(task.topic)">
-                    <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
-                  </div>
-                </template>
-                <template #title>
-                  <h3 class="card__title_completed">{{ task.title }}</h3>
-                </template>
-                <template #date>{{ task.date }}</template>
-              </Task>
+              <Task
+                v-for="task in tasks.filter((t) => t.status === 'Готово')"
+                :key="task.id"
+                :task="task"
+                @open-task="openTaskModal"
+              />
             </template>
           </template>
         </TaskColumn>
       </template>
     </main>
 
-    <NewCardModal
-      v-if="isNewCardOpen"
+    <NewCardModal v-if="isNewCardOpen" @close="closeModals" @add-task="handleAddTask" />
+
+    <TaskModal
+      v-if="isBrowseOpen && selectedTask"
+      :task="selectedTask"
       @close="closeModals"
-      @add-task="handleAddTask"
+      @update-status="handleUpdateTaskStatus"
     />
 
-    <ExitModal
-      v-if="$route.hash === '#popExit'" :user="currentUser"
-      @close="closeModals"
-    />
+    <ExitModal v-if="$route.hash === '#popExit'" :user="currentUser" @close="closeModals" />
   </div>
 </template>
 
