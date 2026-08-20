@@ -10,6 +10,8 @@ import Task from '@/components/Task.vue'
 import TaskSkeleton from '@/components/TaskSkeleton.vue'
 import NewCardModal from '@/components/NewCardModal.vue'
 import TaskModal from '@/components/TaskModal.vue'
+import ExitModal from '@/components/ExitModal.vue'
+import ExitExitModal from '@/components/ExitExitModal.vue'
 
 const tasks = ref(initialTasks)
 
@@ -18,12 +20,16 @@ const router = useRouter()
 const isNewCardOpen = ref(false)
 const isBrowseOpen = ref(false)
 const selectedTask = ref(null)
+const isExitOpen = ref(false)
+const isConfirmExitOpen = ref(false)
 
 watch(
   () => route.hash,
   (newHash) => {
     isNewCardOpen.value = newHash === '#popNewCard'
     isBrowseOpen.value = newHash === '#popBrowseCard'
+    isExitOpen.value = newHash === '#user-set-target'
+    isConfirmExitOpen.value = newHash === '#popExit'
 
     if (newHash !== '#popBrowseCard') {
       selectedTask.value = null
@@ -194,7 +200,15 @@ const openTaskModal = (id) => {
       @update-status="handleUpdateTaskStatus"
     />
 
-    <ExitModal v-if="$route.hash === '#popExit'" :user="currentUser" @close="closeModals" />
+    <ExitModal
+      v-if="$route.hash === '#user-set-target'" :user="currentUser"
+      @close="closeModals"
+    />
+
+    <ExitExitModal v-if="$route.hash === '#popExit'"
+      @close="closeModals"
+      @confirm="handleLogout"
+    />
   </div>
 </template>
 

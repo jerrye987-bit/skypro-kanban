@@ -8,9 +8,12 @@
         <button class="btn-primary">Создать новую задачу</button>
       </a>
       <button class="btn-secondary">
-        <a href="#popExit">{{ user.name }}</a>
+        <a href="#user-set-target">{{ user.name }}</a>
       </button>
-      <ExitModal v-if="$route.hash === '#popExit'" :user="user" @close="closeModal" />
+      <ExitModal
+        v-if="$route.hash === '#user-set-target'" :user="user"
+        @close="closeModal"
+      />
     </nav>
   </header>
 </template>
@@ -29,7 +32,7 @@ defineProps({
 const router = useRouter()
 
 const closeModal = () => {
-  router.push('/') // Очищаем хэш при закрытии
+  router.push({ hash: '' })
 }
 
 defineEmits(['open-profile'])

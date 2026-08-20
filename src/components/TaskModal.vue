@@ -306,7 +306,7 @@
   line-height: 1px;
   color: #94a6be;
   letter-spacing: -0.14px;
-  font-family: "Roboto", Arial, Helvetica, sans-serif !important;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
 }
 .form-browse__area::placeholder {
   font-weight: 400;
@@ -314,7 +314,7 @@
   line-height: 1px;
   color: #94a6be;
   letter-spacing: -0.14px;
-  font-family: "Roboto", Arial, Helvetica, sans-serif !important;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
 }
 
 ._btn-bor {
