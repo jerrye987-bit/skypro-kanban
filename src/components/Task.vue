@@ -1,4 +1,20 @@
-<script setup></script>
+<script setup>
+defineProps({
+  task: {
+    type: Object,
+    required: true,
+  },
+})
+
+defineEmits(['open-task'])
+
+const getThemeClass = (topic) => {
+  if (topic === 'Web Design') return '_orange'
+  if (topic === 'Research') return '_green'
+  if (topic === 'Copywriting') return '_purple'
+  return '_orange'
+}
+</script>
 
 <style lang="scss" scoped></style>
 
@@ -7,11 +23,12 @@
     <div class="cards__card card">
       <div class="card__group">
         <slot name="theme">
-          <div class="card__theme _orange">
-            <p class="_orange">Web Design</p>
+          <div class="card__theme" :class="getThemeClass(task.topic)">
+            <p :class="getThemeClass(task.topic)">{{ task.topic }}</p>
           </div>
         </slot>
-        <a href="#popBrowse" target="_self" @click.prevent>
+
+        <a href="#popBrowse" target="_self" @click.prevent="$emit('open-task', task.id)">
           <div class="card__btn">
             <div></div>
             <div></div>
@@ -19,12 +36,16 @@
           </div>
         </a>
       </div>
+
       <div class="card__content">
-        <a href="" target="_blank">
+        <a href="#" @click.prevent="$emit('open-task', task.id)">
           <slot name="title">
-            <h3 class="card__title">Название задачи</h3>
+            <h3 :class="task.status === 'Готово' ? 'card__title_completed' : 'card__title'">
+              {{ task.title }}
+            </h3>
           </slot>
         </a>
+
         <div class="card__date">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +75,7 @@
               </clipPath>
             </defs>
           </svg>
-          <p>30.10.23</p>
+          <p>{{ task.date }}</p>
         </div>
       </div>
     </div>

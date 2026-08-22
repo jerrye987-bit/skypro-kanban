@@ -1,35 +1,43 @@
 <template>
-  <div class="pop-new-card" id="popNewCard" @click="$emit('close')">
-    <div class="pop-new-card__container">
-      <div class="pop-new-card__block" @click.stop>
-        <div class="pop-new-card__content">
-          <div class="pop-new-card__header-wrap">
-            <h3 class="pop-new-card__ttl">Создание задачи</h3>
-            <a href="#" class="pop-new-card__close" @click.prevent="$emit('close')">✖</a>
+  <div class="pop-browse" id="popBrowse">
+    <div class="pop-browse__container">
+      <div class="pop-browse__block">
+        <div class="pop-browse__content">
+          <div class="pop-browse__top-block">
+            <h3 class="pop-browse__ttl">Название задачи</h3>
+            <div class="categories__theme theme-top _orange _active-category">
+              <p class="_orange">Web Design</p>
+            </div>
           </div>
-
-          <div class="pop-new-card__wrap">
-            <form class="pop-new-card__form form-new" id="formNewCard" @submit.prevent="submitForm">
-              <div class="form-new__block">
-                <label for="formTitle" class="subttl">Название задачи</label>
-                <input
-                  v-model="title"
-                  class="form-new__input"
-                  type="text"
-                  name="name"
-                  id="formTitle"
-                  placeholder="Введите название задачи..."
-                  autofocus
-                  required
-                />
+          <div class="pop-browse__status status">
+            <p class="status__p subttl">Статус</p>
+            <div class="status__themes">
+              <div class="status__theme _hide">
+                <p>Без статуса</p>
               </div>
-              <div class="form-new__block">
-                <label for="textArea" class="subttl">Описание задачи</label>
+              <div class="status__theme _gray">
+                <p class="_gray">Нужно сделать</p>
+              </div>
+              <div class="status__theme _hide">
+                <p>В работе</p>
+              </div>
+              <div class="status__theme _hide">
+                <p>Тестирование</p>
+              </div>
+              <div class="status__theme _hide">
+                <p>Готово</p>
+              </div>
+            </div>
+          </div>
+          <div class="pop-browse__wrap">
+            <form class="pop-browse__form form-browse" id="formBrowseCard" action="#">
+              <div class="form-browse__block">
+                <label for="textArea01" class="subttl">Описание задачи</label>
                 <textarea
-                  v-model="description"
-                  class="form-new__area"
+                  class="form-browse__area"
                   name="text"
-                  id="textArea"
+                  id="textArea01"
+                  readonly
                   placeholder="Введите описание задачи..."
                 ></textarea>
               </div>
@@ -66,7 +74,6 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="calendar__content">
                   <div class="calendar__days-names">
                     <div class="calendar__day-name">пн</div>
@@ -90,7 +97,7 @@
                     <div class="calendar__cell _cell-day">6</div>
                     <div class="calendar__cell _cell-day">7</div>
                     <div class="calendar__cell _cell-day _current">8</div>
-                    <div class="calendar__cell _cell-day _weekend">9</div>
+                    <div class="calendar__cell _cell-day _weekend _active-day">9</div>
                     <div class="calendar__cell _cell-day _weekend">10</div>
                     <div class="calendar__cell _cell-day">11</div>
                     <div class="calendar__cell _cell-day">12</div>
@@ -116,6 +123,7 @@
                   </div>
                 </div>
 
+                <input type="hidden" id="datepick_value" value="08.09.2023" />
                 <div class="calendar__period">
                   <p class="calendar__p date-end">
                     Срок исполнения: <span class="date-control"></span>
@@ -124,164 +132,175 @@
               </div>
             </div>
           </div>
-
-          <div class="pop-new-card__categories categories">
+          <div class="theme-down__categories theme-down">
             <p class="categories__p subttl">Категория</p>
-            <div class="categories__themes">
-              <div
-                class="categories__theme _orange"
-                :class="{ '_active-category': topic === 'Web Design' }"
-                @click="topic = 'Web Design'"
-              >
-                <p class="_orange">Web Design</p>
-              </div>
-
-              <div
-                class="categories__theme _green"
-                :class="{ '_active-category': topic === 'Research' }"
-                @click="topic = 'Research'"
-              >
-                <p class="_green">Research</p>
-              </div>
-
-              <div
-                class="categories__theme _purple"
-                :class="{ '_active-category': topic === 'Copywriting' }"
-                @click="topic = 'Copywriting'"
-              >
-                <p class="_purple">Copywriting</p>
-              </div>
+            <div class="categories__theme _orange _active-category">
+              <p class="_orange">Web Design</p>
             </div>
           </div>
-
-          <button type="submit" form="formNewCard" class="form-new__create _hover01" id="btnCreate">
-            Создать задачу
-          </button>
+          <div class="pop-browse__btn-browse">
+            <div class="btn-group">
+              <button class="btn-browse__edit _btn-bor _hover03">
+                <a href="#">Редактировать задачу</a>
+              </button>
+              <button class="btn-browse__delete _btn-bor _hover03">
+                <a href="#">Удалить задачу</a>
+              </button>
+            </div>
+            <button class="btn-browse__close _btn-bg _hover01"><a href="#">Закрыть</a></button>
+          </div>
+          <div class="pop-browse__btn-edit _hide">
+            <div class="btn-group">
+              <button class="btn-edit__edit _btn-bg _hover01"><a href="#">Сохранить</a></button>
+              <button class="btn-edit__edit _btn-bor _hover03"><a href="#">Отменить</a></button>
+              <button class="btn-edit__delete _btn-bor _hover03" id="btnDelete">
+                <a href="#">Удалить задачу</a>
+              </button>
+            </div>
+            <button class="btn-edit__close _btn-bg _hover01"><a href="#">Закрыть</a></button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-
-const emit = defineEmits(['close', 'add-task'])
-
-const title = ref('')
-const description = ref('')
-const topic = ref('Web Design')
-
-const submitForm = () => {
-  if (!title.value.trim()) return
-
-  emit('add-task', {
-    title: title.value,
-    topic: topic.value,
-    date: '08.09.23',
-  })
-
-  title.value = ''
-  description.value = ''
-  topic.value = 'Web Design'
-}
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
-.pop-new-card {
+.pop-browse {
   display: flex;
   width: 100%;
-  min-width: 375px;
   height: 100%;
+  min-width: 375px;
   min-height: 100vh;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  z-index: 6;
+  z-index: 7;
 }
-.pop-new-card__container {
+.pop-browse__container {
   width: 100%;
   height: 100%;
   min-height: 100vh;
   padding: 0 16px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding-top: 150px;
-  padding-left: -100px;
+  align-items: center;
+  justify-content: center;
   background: rgba(0, 0, 0, 0.4);
 }
-.pop-new-card__block {
+.pop-browse__block {
   display: block;
   margin: 0 auto;
   background-color: #ffffff;
   max-width: 630px;
   width: 100%;
-  padding: 40px 30px 48px;
+  padding: 40px 30px 38px;
   border-radius: 10px;
   border: 0.7px solid #d4dbe5;
   position: relative;
 }
-.pop-new-card__content {
+.pop-browse__content {
   display: block;
   text-align: left;
 }
-.pop-new-card__ttl {
+.pop-browse__content .categories__theme {
+  opacity: 1;
+}
+.pop-browse__content .theme-down {
+  display: none;
+  margin-bottom: 20px;
+}
+.pop-browse__content .theme-top {
+  display: block;
+}
+.pop-browse__top-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.pop-browse__ttl {
   color: #000;
   font-size: 20px;
   font-weight: 600;
   line-height: 24px;
-  margin-bottom: 20px;
 }
-.pop-new-card__close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  color: #94a6be;
-  cursor: pointer;
-}
-.pop-new-card__close:hover {
-  color: #000000;
-}
-.pop-new-card__wrap {
+.pop-browse__wrap {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 }
-.pop-new-card__form {
+.pop-browse__form {
   max-width: 370px;
   width: 100%;
   display: block;
   margin-bottom: 20px;
 }
+.pop-browse__btn-browse,
+.pop-browse__btn-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.pop-browse__btn-browse button,
+.pop-browse__btn-edit button {
+  height: 30px;
+  margin-bottom: 10px;
+  padding: 0 14px;
+}
+.pop-browse__btn-browse .btn-group button,
+.pop-browse__btn-edit .btn-group button {
+  margin-right: 8px;
+}
 
-.form-new__block {
+.status {
+  margin-bottom: 11px;
+}
+.status__p {
+  margin-bottom: 14px;
+}
+.status__themes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.status__theme {
+  border-radius: 24px;
+  border: 0.7px solid rgba(148, 166, 190, 0.4);
+  color: #94a6be;
+  padding: 11px 14px 10px;
+  margin-right: 7px;
+  margin-bottom: 7px;
+}
+.status__theme p {
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: -0.14px;
+}
+
+.form-browse__block {
   display: flex;
   flex-direction: column;
 }
-.form-new__input,
-.form-new__area {
+.form-browse__area {
+  max-width: 370px;
   width: 100%;
   outline: none;
   padding: 14px;
-  background: transparent;
+  background: #eaeef6;
   border: 0.7px solid rgba(148, 166, 190, 0.4);
   border-radius: 8px;
   font-size: 14px;
   line-height: 1;
   letter-spacing: -0.14px;
+  margin-top: 14px;
+  height: 200px;
 }
-.form-new__input::-moz-placeholder,
-.form-new__area::-moz-placeholder {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1px;
-  color: #94a6be;
-  letter-spacing: -0.14px;
-}
-.form-new__input::placeholder,
-.form-new__area::placeholder {
+.form-browse__area::-moz-placeholder {
   font-weight: 400;
   font-size: 14px;
   line-height: 1px;
@@ -289,25 +308,37 @@ const submitForm = () => {
   letter-spacing: -0.14px;
   font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
 }
-.form-new__input {
-  margin: 20px 0;
-}
-.form-new__area {
-  max-width: 370px;
-  margin-top: 14px;
-  height: 200px;
-}
-.form-new__create {
-  width: 132px;
-  height: 30px;
-  background-color: #565eef;
-  border-radius: 4px;
-  border: 0;
-  outline: none;
+.form-browse__area::placeholder {
+  font-weight: 400;
   font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
+  line-height: 1px;
+  color: #94a6be;
+  letter-spacing: -0.14px;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
+}
+
+._btn-bor {
+  border-radius: 4px;
+  border: 0.7px solid var(--palette-navy-60, #565eef) !important;
+  outline: none;
+  background: transparent;
+  color: #565eef;
+}
+._btn-bor a {
+  color: #565eef;
+}
+._btn-bg {
+  border-radius: 4px;
+  background: #565eef;
+  border: none;
+  outline: none;
   color: #ffffff;
-  float: right;
+}
+._btn-bg a {
+  color: #ffffff;
+}
+
+._hide {
+  display: none;
 }
 </style>
