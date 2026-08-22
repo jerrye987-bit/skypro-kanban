@@ -23,6 +23,18 @@ const selectedTask = ref(null)
 const isExitOpen = ref(false)
 const isConfirmExitOpen = ref(false)
 
+const handleLogout = () => {
+  localStorage.removeItem('user')
+
+  if (typeof closeModals === 'function') {
+    closeModals()
+  } else {
+    router.push({ hash: '' })
+  }
+
+  router.push('/login')
+}
+
 watch(
   () => route.hash,
   (newHash) => {
@@ -205,7 +217,8 @@ const openTaskModal = (id) => {
       @close="closeModals"
     />
 
-    <ExitExitModal v-if="$route.hash === '#popExit'"
+    <ExitExitModal
+      v-if="isConfirmExitOpen"
       @close="closeModals"
       @confirm="handleLogout"
     />
