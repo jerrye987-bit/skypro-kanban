@@ -397,8 +397,8 @@ body {
 .card__content a:visited,
 .card__content a:hover,
 .card__content a:active {
-  color: inherit !important;       /* 👈 Брать цвет заголовка h3, а не системный вишневый */
-  text-decoration: none !important; /* Убирает подчеркивание */
+  color: inherit !important;
+  text-decoration: none !important;
 }
 .cards {
   width: 100%;

@@ -19,7 +19,6 @@
                   name="name"
                   id="formTitle"
                   placeholder="Введите название задачи..."
-                  autofocus
                   required
                 />
               </div>
@@ -170,6 +169,7 @@ const emit = defineEmits(['close', 'add-task'])
 
 const title = ref('')
 const description = ref('')
+const date = ref('')
 const topic = ref('Web Design')
 
 const submitForm = () => {
@@ -178,7 +178,8 @@ const submitForm = () => {
   emit('add-task', {
     title: title.value,
     topic: topic.value,
-    date: '08.09.23',
+    date: date.value,
+    description: description.value
   })
 
   title.value = ''

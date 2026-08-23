@@ -59,6 +59,7 @@ const handleAddTask = (newTaskData) => {
     id: tasks.value.length ? Math.max(...tasks.value.map((t) => t.id)) + 1 : 1,
     topic: newTaskData.topic || 'Web Design',
     title: newTaskData.title || 'Новая задача',
+    description: newTaskData.description || '',
     date: newTaskData.date || new Date().toLocaleDateString('ru-RU'),
     status: 'Без статуса',
   }
@@ -89,6 +90,19 @@ const openTaskModal = (id) => {
   if (selectedTask.value) {
     router.push({ hash: '#popBrowseCard' })
   }
+}
+
+const handleUpdateTask = (updatedTask) => {
+  const index = tasks.value.findIndex((t) => t.id === updatedTask.id)
+  if (index !== -1) {
+    tasks.value[index] = updatedTask
+  }
+  closeModals()
+}
+
+const handleBasketTask = (taskId) => {
+  tasks.value = tasks.value.filter((t) => t.id !== taskId)
+  closeModals()
 }
 </script>
 
@@ -209,19 +223,13 @@ const openTaskModal = (id) => {
       v-if="isBrowseOpen && selectedTask"
       :task="selectedTask"
       @close="closeModals"
-      @update-status="handleUpdateTaskStatus"
+      @update-task="handleUpdateTask"
+      @delete-task="handleBasketTask"
     />
 
-    <ExitModal
-      v-if="$route.hash === '#user-set-target'" :user="currentUser"
-      @close="closeModals"
-    />
+    <ExitModal v-if="$route.hash === '#user-set-target'" :user="currentUser" @close="closeModals" />
 
-    <ExitExitModal
-      v-if="isConfirmExitOpen"
-      @close="closeModals"
-      @confirm="handleLogout"
-    />
+    <ExitExitModal v-if="isConfirmExitOpen" @close="closeModals" @confirm="handleLogout" />
   </div>
 </template>
 

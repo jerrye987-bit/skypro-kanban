@@ -10,10 +10,7 @@
       <button class="btn-secondary">
         <a href="#user-set-target">{{ user.name }}</a>
       </button>
-      <ExitModal
-        v-if="$route.hash === '#user-set-target'" :user="user"
-        @close="closeModal"
-      />
+      <ExitModal v-if="$route.hash === '#user-set-target'" :user="user" @close="closeModal" />
     </nav>
   </header>
 </template>

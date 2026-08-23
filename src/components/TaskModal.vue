@@ -1,47 +1,63 @@
 <template>
-  <div class="pop-browse" id="popBrowse">
+  <div class="pop-browse" id="popBrowse" @click="$emit('close')">
     <div class="pop-browse__container">
-      <div class="pop-browse__block">
+      <div class="pop-browse__block" @click.stop>
         <div class="pop-browse__content">
+          <!-- Заголовок и Категория карточки -->
           <div class="pop-browse__top-block">
-            <h3 class="pop-browse__ttl">Название задачи</h3>
-            <div class="categories__theme theme-top _orange _active-category">
-              <p class="_orange">Web Design</p>
+            <input
+              v-if="isEditing"
+              v-model="editedTitle"
+              type="text"
+              class="form-browse__input-title"
+            />
+
+            <h3 v-else class="pop-browse__ttl">{{ task?.title }}</h3>
+
+            <div :class="['categories__theme', 'theme-top', getCategoryColorClass(task?.topic), '_active-category']">
+              <p :class="getCategoryColorClass(task?.topic)">{{ task?.topic || 'Web Design' }}</p>
             </div>
           </div>
+
+          <!-- Блок Статуса (Колонки доски) -->
           <div class="pop-browse__status status">
             <p class="status__p subttl">Статус</p>
             <div class="status__themes">
-              <div class="status__theme _hide">
-                <p>Без статуса</p>
-              </div>
-              <div class="status__theme _gray">
-                <p class="_gray">Нужно сделать</p>
-              </div>
-              <div class="status__theme _hide">
-                <p>В работе</p>
-              </div>
-              <div class="status__theme _hide">
-                <p>Тестирование</p>
-              </div>
-              <div class="status__theme _hide">
-                <p>Готово</p>
-              </div>
+              <template v-if="isEditing">
+                <div
+                  v-for="statusItem in statuses"
+                  :key="statusItem"
+                  :class="['status__theme', { '_active-status': editedStatus === statusItem }]"
+                  @click="editedStatus = statusItem"
+                >
+                  <p>{{ statusItem }}</p>
+                </div>
+              </template>
+              <template v-else>
+                <div class="status__theme _gray">
+                  <p class="_gray">{{ task?.status || 'Без статуса' }}</p>
+                </div>
+              </template>
             </div>
           </div>
+
+          <!-- Описание задачи и Календарь -->
           <div class="pop-browse__wrap">
-            <form class="pop-browse__form form-browse" id="formBrowseCard" action="#">
+            <form class="pop-browse__form form-browse" id="formBrowseCard" @submit.prevent>
               <div class="form-browse__block">
                 <label for="textArea01" class="subttl">Описание задачи</label>
                 <textarea
+                  v-model="editedDescription"
                   class="form-browse__area"
                   name="text"
                   id="textArea01"
-                  readonly
+                  :readonly="!isEditing"
                   placeholder="Введите описание задачи..."
                 ></textarea>
               </div>
             </form>
+
+            <!-- Блок статического календаря -->
             <div class="pop-new-card__calendar calendar">
               <p class="calendar__ttl subttl">Даты</p>
               <div class="calendar__block">
@@ -132,29 +148,41 @@
               </div>
             </div>
           </div>
+
+          <!-- Нижняя категория -->
           <div class="theme-down__categories theme-down">
             <p class="categories__p subttl">Категория</p>
-            <div class="categories__theme _orange _active-category">
-              <p class="_orange">Web Design</p>
+            <div :class="['categories__theme', getCategoryColorClass(task?.topic), '_active-category']">
+              <p :class="getCategoryColorClass(task?.topic)">{{ task?.topic || 'Web Design' }}</p>
             </div>
           </div>
-          <div class="pop-browse__btn-browse">
+
+          <!-- БЛОК КНОПОК РЕЖИМА ПРОСМОТРА -->
+          <div v-if="!isEditing" class="pop-browse__btn-browse">
             <div class="btn-group">
-              <button class="btn-browse__edit _btn-bor _hover03">
-                <a href="#">Редактировать задачу</a>
+              <button class="btn-browse__edit _btn-bor _hover03" @click="isEditing = true">
+                Редактировать задачу
               </button>
-              <button class="btn-browse__delete _btn-bor _hover03">
-                <a href="#">Удалить задачу</a>
+              <button class="btn-browse__delete _btn-bor _hover03" @click="$emit('delete-task', task.id)">
+                Удалить задачу
               </button>
             </div>
-            <button class="btn-browse__close _btn-bg _hover01"><a href="#">Закрыть</a></button>
+            <button class="btn-browse__close _btn-bg _hover01" @click="$emit('close')">
+              Закрыть
+            </button>
           </div>
-          <div class="pop-browse__btn-edit _hide">
+
+          <!-- 🔘 БЛОК КНОПОК РЕЖИМА РЕДАКТИРОВАНИЯ -->
+          <div v-else class="pop-browse__btn-edit">
             <div class="btn-group">
-              <button class="btn-edit__edit _btn-bg _hover01"><a href="#">Сохранить</a></button>
-              <button class="btn-edit__edit _btn-bor _hover03"><a href="#">Отменить</a></button>
-              <button class="btn-edit__delete _btn-bor _hover03" id="btnDelete">
-                <a href="#">Удалить задачу</a>
+              <button class="btn-edit__edit _btn-bg _hover01" @click="saveChanges">
+                Сохранить
+              </button>
+              <button class="btn-edit__edit _btn-bor _hover03" @click="cancelEditing">
+                Отменить
+              </button>
+              <button class="btn-edit__delete _btn-bor _hover03" @click="$emit('delete-task', task.id)">
+                Удалить задачу
               </button>
             </div>
             <button class="btn-edit__close _btn-bg _hover01"><a href="#">Закрыть</a></button>
@@ -165,7 +193,64 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+  import { ref, watch } from 'vue'
+
+  const props = defineProps({
+    task: {
+      type: Object,
+      required: true
+    }
+  })
+
+  const emit = defineEmits(['close', 'update-task', 'delete-task'])
+
+  const isEditing = ref(false)
+
+  const editedTitle = ref('')
+  const editedDescription = ref('')
+  const editedStatus = ref('')
+
+  const statuses = ['Без статуса', 'Нужно сделать', 'В работе', 'Тестирование', 'Готово']
+
+  watch(() => props.task, (newTask) => {
+    if (newTask) {
+      editedTitle.value = newTask.title || ''
+      editedDescription.value = newTask.description || ''
+      editedStatus.value = newTask.status || 'Без статуса'
+      isEditing.value = false
+    }
+  }, { immediate: true })
+
+  const cancelEditing = () => {
+    editedTitle.value = props.props?.task?.title || ''
+    editedDescription.value = props.task?.description || ''
+    editedStatus.value = props.task?.status || 'Без статуса'
+    isEditing.value = false
+  }
+
+  const saveChanges = () => {
+    if (!editedTitle.value.trim()) return
+
+    emit('update-task', {
+      ...props.task,
+      title: editedTitle.value,
+      description: editedDescription.value,
+      status: editedStatus.value
+    })
+    isEditing.value = false
+  }
+
+  const getCategoryColorClass = (topicName) => {
+    if (!topicName) return '_orange'
+
+    const text = topicName.toLowerCase()
+
+    if (text.includes('web') || text.includes('design') || text.includes('дизайн')) return '_orange'
+    if (text.includes('copy') || text.includes('text') || text.includes('текст')) return '_purple'
+    return '_green'
+  }
+</script>
 
 <style lang="scss" scoped>
 .pop-browse {
@@ -273,6 +358,7 @@
   border: 0.7px solid rgba(148, 166, 190, 0.4);
   color: #94a6be;
   padding: 11px 14px 10px;
+  cursor: pointer;
   margin-right: 7px;
   margin-bottom: 7px;
 }
@@ -280,6 +366,13 @@
   font-size: 14px;
   line-height: 1;
   letter-spacing: -0.14px;
+}
+._active-status {
+  background-color: #94A6BE !important;
+  color: #FFFFFF !important;
+  p {
+    color: #FFFFFF !important;
+  }
 }
 
 .form-browse__block {
@@ -315,6 +408,18 @@
   color: #94a6be;
   letter-spacing: -0.14px;
   font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
+}
+.form-browse__input-title {
+  font-family: "Roboto", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: -0.6px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  outline: none;
+  margin-bottom: 10px;
 }
 
 ._btn-bor {

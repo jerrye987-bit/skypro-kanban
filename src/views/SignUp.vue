@@ -46,16 +46,25 @@
             <button
               type="submit"
               :disabled="isButtonDisabled"
-              :class="['modal__btn-signup-ent', { '_hover01': !isButtonDisabled, 'modal__btn-signup-ent--disabled': isButtonDisabled }]"
+              :class="[
+                'modal__btn-signup-ent',
+                {
+                  _hover01: !isButtonDisabled,
+                  'modal__btn-signup-ent--disabled': isButtonDisabled,
+                },
+              ]"
             >
               Зарегистрироваться
             </button>
 
             <div class="modal__form-group modal__form-group--signup">
-              <p>Уже есть аккаунт? </p>
+              <p>Уже есть аккаунт?</p>
               <router-link
                 to="/login"
-                style="color: rgba(148, 166, 190, 0.4) !important; text-decoration: underline !important;"
+                style="
+                  color: rgba(148, 166, 190, 0.4) !important;
+                  text-decoration: underline !important;
+                "
               >
                 Войдите здесь
               </router-link>
@@ -68,61 +77,64 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
-  import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
-  const router = useRouter()
+const router = useRouter()
 
-  const name = ref('')
-  const email = ref('')
-  const password = ref('')
-  const errorMessage = ref('')
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
 
-  const isValidationFailed = ref(false)
+const isValidationFailed = ref(false)
 
-  const isNameInvalid = computed(() => {
-    return isValidationFailed.value && !name.value.trim()
-  })
+const isNameInvalid = computed(() => {
+  return isValidationFailed.value && !name.value.trim()
+})
 
-  const isEmailInvalid = computed(() => {
-    return isValidationFailed.value && !email.value.trim()
-  })
+const isEmailInvalid = computed(() => {
+  return isValidationFailed.value && !email.value.trim()
+})
 
-  const isPasswordInvalid = computed(() => {
-    return isValidationFailed.value && (!password.value.trim() || password.value.length < 6)
-  })
+const isPasswordInvalid = computed(() => {
+  return isValidationFailed.value && (!password.value.trim() || password.value.length < 6)
+})
 
-  const isButtonDisabled = computed(() => {
-    return isValidationFailed.value
-  })
+const isButtonDisabled = computed(() => {
+  return isValidationFailed.value
+})
 
-  const clearFieldError = () => {
-    if (isValidationFailed.value) {
-      isValidationFailed.value = false
-      errorMessage.value = ''
-    }
+const clearFieldError = () => {
+  if (isValidationFailed.value) {
+    isValidationFailed.value = false
+    errorMessage.value = ''
+  }
+}
+
+const handleSignUp = () => {
+  if (!name.value.trim() || !email.value.trim() || !password.value.trim()) {
+    isValidationFailed.value = true
+    errorMessage.value = 'Заполните все поля'
+    return
   }
 
-  const handleSignUp = () => {
-    if (!name.value.trim() || !email.value.trim() || !password.value.trim()) {
-      isValidationFailed.value = true
-      errorMessage.value = 'Заполните все поля'
-      return
-    }
+  if (password.value.length < 6) {
+    isValidationFailed.value = true
+    errorMessage.value = 'Пароль должен быть не менее 6 символов'
+    return
+  }
 
-    if (password.value.length < 6) {
-      isValidationFailed.value = true
-      errorMessage.value = 'Пароль должен быть не менее 6 символов'
-      return
-    }
-
-    localStorage.setItem('user', JSON.stringify({
+  localStorage.setItem(
+    'user',
+    JSON.stringify({
       name: name.value,
-      email: email.value
-    }))
+      email: email.value,
+    }),
+  )
 
-    router.push('/')
-  }
+  router.push('/')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -131,7 +143,7 @@
   height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
-  background-color: #EAEEF6;
+  background-color: #eaeef6;
 }
 
 .container-signup {
@@ -159,12 +171,12 @@
 .modal__block {
   display: block;
   margin: 0 auto;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   max-width: 368px;
   width: 100%;
   padding: 50px 60px;
   border-radius: 10px;
-  border: 0.7px solid #D4DBE5;
+  border: 0.7px solid #d4dbe5;
   box-shadow: 0px 4px 67px -12px rgba(0, 0, 0, 0.13);
 }
 
@@ -197,7 +209,7 @@
   border: 0.7px solid rgba(148, 166, 190, 0.4);
   outline: none;
   padding: 10px 8px;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
   transition: border-color 0.2s ease;
 }
@@ -209,26 +221,26 @@
 
 .modal__input::placeholder,
 .modal__input::-moz-placeholder {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 21px;
   letter-spacing: -0.28px;
-  color: #94A6BE;
+  color: #94a6be;
 }
 
 .modal__error {
   color: #f84242;
   font-size: 12px;
   margin-top: 5px;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   text-align: center;
 }
 
 .modal__btn-signup-ent {
   width: 100%;
   height: 30px;
-  background-color: #565EEF;
+  background-color: #565eef;
   border-radius: 4px;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -241,15 +253,15 @@
   line-height: 21px;
   font-weight: 500;
   letter-spacing: -0.14px;
-  color: #FFFFFF;
-  font-family: "Roboto", sans-serif;
+  color: #ffffff;
+  font-family: 'Roboto', sans-serif;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .modal__btn-signup-ent--disabled {
-  background-color: #94A6BE !important;
-  color: #FFFFFF !important;
+  background-color: #94a6be !important;
+  color: #ffffff !important;
   cursor: not-allowed !important;
   pointer-events: none;
 }
@@ -271,13 +283,13 @@
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.14px;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   margin: 0;
 }
 
 @media screen and (max-width: 375px) {
   .modal {
-    background-color: #FFFFFF;
+    background-color: #ffffff;
   }
   .modal__block {
     max-width: 368px;
