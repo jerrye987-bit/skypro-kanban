@@ -49,7 +49,7 @@
             <div class="modal__form-group modal__form-group--signin">
               <p>Нужно зарегистрироваться?</p>
               <router-link
-                to="/signup"
+                to="/register"
                 style="
                   color: rgba(148, 166, 190, 0.4) !important;
                   text-decoration: underline !important;

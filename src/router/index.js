@@ -11,25 +11,71 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: TaskDesk,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'exit',
+          name: 'exit',
+          component: TaskDesk
+        },
+        {
+          path: 'card/:id',
+          name: 'card-detail',
+          component: TaskDesk
+        },
+        {
+          path: 'new-card',
+          name: 'new-card',
+          component: TaskDesk
+        }
+      ]
     },
     {
       path: '/login',
       name: 'login',
       component: SignInView,
+      meta: { requiresGuest: true }
     },
 
     {
-      path: '/signup',
-      name: 'signup',
+      path: '/register',
+      name: 'register',
       component: SignUpView,
+      meta: { requiresGuest: true }
+    },
+
+    {
+      path: '/404',
+      name: 'not-found',
+      component: NotFoundView,
     },
 
     {
       path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: NotFoundView,
-    },
+      redirect:'/404'
+    }
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('user')
+
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiresGuest = to.matched.some(record => record.meta.requiresGuest)
+
+  if (requiresAuth && !isAuthenticated) {
+    console.warn ('Доступ запрещен! Перенаправление на страницу входа.')
+    next('/login')
+  }
+
+  else if (requiresGuest && isAuthenticated) {
+    console.info('Пользователь уже авторизован. Перенаправление на главную')
+    next('/')
+  }
+
+  else {
+    next()
+  }
 })
 
 export default router

@@ -17,6 +17,7 @@ const tasks = ref(initialTasks)
 
 const route = useRoute()
 const router = useRouter()
+
 const isNewCardOpen = ref(false)
 const isBrowseOpen = ref(false)
 const selectedTask = ref(null)
@@ -29,21 +30,25 @@ const handleLogout = () => {
   if (typeof closeModals === 'function') {
     closeModals()
   } else {
-    router.push({ hash: '' })
+    router.push('/')
   }
 
   router.push('/login')
 }
 
 watch(
-  () => route.hash,
-  (newHash) => {
-    isNewCardOpen.value = newHash === '#popNewCard'
-    isBrowseOpen.value = newHash === '#popBrowseCard'
-    isExitOpen.value = newHash === '#user-set-target'
-    isConfirmExitOpen.value = newHash === '#popExit'
+  () => [route.path, route.hash],
+  ([newPath, newHash]) => {
+    isNewCardOpen.value = newPath === '/new-card'
+    isExitOpen.value = newPath === '/exit'
+    isConfirmExitOpen.value = newPath === '/exit' && newHash === '#confirm'
 
-    if (newHash !== '#popBrowseCard') {
+    if (newPath.startsWith('/card/')) {
+      const taskId = parseInt(route.params.id, 10)
+      selectedTask.value = tasks.value.find((t) => t.id === taskId)
+      isBrowseOpen.value = !!selectedTask.value
+    } else {
+      isBrowseOpen.value = false
       selectedTask.value = null
     }
   },
@@ -85,11 +90,7 @@ onMounted(() => {
 })
 
 const openTaskModal = (id) => {
-  selectedTask.value = tasks.value.find((t) => t.id === id)
-
-  if (selectedTask.value) {
-    router.push({ hash: '#popBrowseCard' })
-  }
+  router.push(`/card/${id}`)
 }
 
 const handleUpdateTask = (updatedTask) => {
@@ -227,7 +228,7 @@ const handleBasketTask = (taskId) => {
       @delete-task="handleBasketTask"
     />
 
-    <ExitModal v-if="$route.hash === '#user-set-target'" :user="currentUser" @close="closeModals" />
+    <ExitModal v-if="isExitOpen" :user="currentUser" @close="closeModals" />
 
     <ExitExitModal v-if="isConfirmExitOpen" @close="closeModals" @confirm="handleLogout" />
   </div>
