@@ -17,21 +17,38 @@ const tasks = ref(initialTasks)
 
 const route = useRoute()
 const router = useRouter()
+
 const isNewCardOpen = ref(false)
 const isBrowseOpen = ref(false)
 const selectedTask = ref(null)
 const isExitOpen = ref(false)
 const isConfirmExitOpen = ref(false)
 
-watch(
-  () => route.hash,
-  (newHash) => {
-    isNewCardOpen.value = newHash === '#popNewCard'
-    isBrowseOpen.value = newHash === '#popBrowseCard'
-    isExitOpen.value = newHash === '#user-set-target'
-    isConfirmExitOpen.value = newHash === '#popExit'
+const handleLogout = () => {
+  localStorage.removeItem('user')
 
-    if (newHash !== '#popBrowseCard') {
+  if (typeof closeModals === 'function') {
+    closeModals()
+  } else {
+    router.push('/')
+  }
+
+  router.push('/login')
+}
+
+watch(
+  () => [route.path, route.hash],
+  ([newPath, newHash]) => {
+    isNewCardOpen.value = newPath === '/new-card'
+    isExitOpen.value = newPath === '/exit'
+    isConfirmExitOpen.value = newPath === '/exit' && newHash === '#confirm'
+
+    if (newPath.startsWith('/card/')) {
+      const taskId = parseInt(route.params.id, 10)
+      selectedTask.value = tasks.value.find((t) => t.id === taskId)
+      isBrowseOpen.value = !!selectedTask.value
+    } else {
+      isBrowseOpen.value = false
       selectedTask.value = null
     }
   },
@@ -47,6 +64,7 @@ const handleAddTask = (newTaskData) => {
     id: tasks.value.length ? Math.max(...tasks.value.map((t) => t.id)) + 1 : 1,
     topic: newTaskData.topic || 'Web Design',
     title: newTaskData.title || 'Новая задача',
+    description: newTaskData.description || '',
     date: newTaskData.date || new Date().toLocaleDateString('ru-RU'),
     status: 'Без статуса',
   }
@@ -72,11 +90,20 @@ onMounted(() => {
 })
 
 const openTaskModal = (id) => {
-  selectedTask.value = tasks.value.find((t) => t.id === id)
+  router.push(`/card/${id}`)
+}
 
-  if (selectedTask.value) {
-    router.push({ hash: '#popBrowseCard' })
+const handleUpdateTask = (updatedTask) => {
+  const index = tasks.value.findIndex((t) => t.id === updatedTask.id)
+  if (index !== -1) {
+    tasks.value[index] = updatedTask
   }
+  closeModals()
+}
+
+const handleBasketTask = (taskId) => {
+  tasks.value = tasks.value.filter((t) => t.id !== taskId)
+  closeModals()
 }
 </script>
 
@@ -197,18 +224,13 @@ const openTaskModal = (id) => {
       v-if="isBrowseOpen && selectedTask"
       :task="selectedTask"
       @close="closeModals"
-      @update-status="handleUpdateTaskStatus"
+      @update-task="handleUpdateTask"
+      @delete-task="handleBasketTask"
     />
 
-    <ExitModal
-      v-if="$route.hash === '#user-set-target'" :user="currentUser"
-      @close="closeModals"
-    />
+    <ExitModal v-if="isExitOpen" :user="currentUser" @close="closeModals" />
 
-    <ExitExitModal v-if="$route.hash === '#popExit'"
-      @close="closeModals"
-      @confirm="handleLogout"
-    />
+    <ExitExitModal v-if="isConfirmExitOpen" @close="closeModals" @confirm="handleLogout" />
   </div>
 </template>
 

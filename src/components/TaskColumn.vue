@@ -5,14 +5,11 @@
     </h2>
     <div class="cards">
       <slot name="content"></slot>
-      <!-- Здесь будут дублироваться другие компоненты Task -->
     </div>
   </section>
 </template>
 
-<script setup>
-// import Task from '@/components/Task.vue'
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .task-column__title {

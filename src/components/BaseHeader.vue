@@ -4,16 +4,23 @@
       <img src="/assets/images/logo.png" alt="Логотип" class="header__logo-img" />
     </div>
     <nav class="header__nav">
-      <a href="#popNewCard" class="btn-primary-link">
-        <button class="btn-primary">Создать новую задачу</button>
-      </a>
-      <button class="btn-secondary">
-        <a href="#user-set-target">{{ user.name }}</a>
-      </button>
-      <ExitModal
-        v-if="$route.hash === '#user-set-target'" :user="user"
-        @close="closeModal"
-      />
+      <router-link to="/new-card" custom v-slot="{ navigate }">
+        <button
+          @click="navigate"
+          class="btn-primary _hover01"
+          id="btnMainNewCard"
+        >
+          Создать новую задачу
+        </button>
+      </router-link>
+      <router-link to="/exit" custom v-slot="{ navigate }">
+        <button
+          class="btn-secondary"
+          @click="navigate">
+            {{ user.name }}
+        </button>
+      </router-link>
+      <ExitModal v-if="$route.hash === '#user-set-target'" :user="user" @close="closeModal" />
     </nav>
   </header>
 </template>
