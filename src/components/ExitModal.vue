@@ -35,9 +35,7 @@
 
         <div class="pop-exit__form-group">
           <router-link to="/exit#confirm" custom v-slot="{ navigate }">
-            <button @click="navigate" class="pop-user-set__btn _hover03">
-              Выйти
-            </button>
+            <button @click="navigate" class="pop-user-set__btn _hover03">Выйти</button>
           </router-link>
         </div>
       </div>

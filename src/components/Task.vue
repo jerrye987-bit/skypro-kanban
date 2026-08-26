@@ -28,7 +28,7 @@ const getThemeClass = (topic) => {
           </div>
         </slot>
 
-        <a href="#popBrowse" target="_self" @click.prevent="$emit('open-task', task.id)">
+        <a href="#popBrowse" target="_self" @click.prevent="$emit('open-task', task._id)">
           <div class="card__btn">
             <div></div>
             <div></div>
@@ -38,7 +38,7 @@ const getThemeClass = (topic) => {
       </div>
 
       <div class="card__content">
-        <a href="#" @click.prevent="$emit('open-task', task.id)">
+        <a href="#" @click.prevent="$emit('open-task', task._id)">
           <slot name="title">
             <h3 :class="task.status === 'Готово' ? 'card__title_completed' : 'card__title'">
               {{ task.title }}

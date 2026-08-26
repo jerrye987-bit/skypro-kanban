@@ -5,19 +5,13 @@
     </div>
     <nav class="header__nav">
       <router-link to="/new-card" custom v-slot="{ navigate }">
-        <button
-          @click="navigate"
-          class="btn-primary _hover01"
-          id="btnMainNewCard"
-        >
+        <button @click="navigate" class="btn-primary _hover01" id="btnMainNewCard">
           Создать новую задачу
         </button>
       </router-link>
       <router-link to="/exit" custom v-slot="{ navigate }">
-        <button
-          class="btn-secondary"
-          @click="navigate">
-            {{ user.name }}
+        <button class="btn-secondary" @click="navigate">
+          {{ user.name }}
         </button>
       </router-link>
       <ExitModal v-if="$route.hash === '#user-set-target'" :user="user" @close="closeModal" />

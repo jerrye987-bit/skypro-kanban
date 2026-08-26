@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { initialTasks } from '@/mocks/tasks.js'
+// import { initialTasks } from '@/mocks/tasks.js'
 import { useTheme } from '@/composables/useTheme.js'
 
 import BaseHeader from '@/components/BaseHeader.vue'
@@ -13,7 +13,9 @@ import TaskModal from '@/components/TaskModal.vue'
 import ExitModal from '@/components/ExitModal.vue'
 import ExitExitModal from '@/components/ExitExitModal.vue'
 
-const tasks = ref(initialTasks)
+import { fetchTask, postTask, editTask, deleteTask } from '@/services/api.js'
+
+const tasks = ref([])
 
 const route = useRoute()
 const router = useRouter()
@@ -23,6 +25,7 @@ const isBrowseOpen = ref(false)
 const selectedTask = ref(null)
 const isExitOpen = ref(false)
 const isConfirmExitOpen = ref(false)
+const errorMessage = ref('')
 
 const handleLogout = () => {
   localStorage.removeItem('user')
@@ -44,8 +47,8 @@ watch(
     isConfirmExitOpen.value = newPath === '/exit' && newHash === '#confirm'
 
     if (newPath.startsWith('/card/')) {
-      const taskId = parseInt(route.params.id, 10)
-      selectedTask.value = tasks.value.find((t) => t.id === taskId)
+      const taskId = route.params.id
+      selectedTask.value = tasks.value.find((t) => t._id === taskId)
       isBrowseOpen.value = !!selectedTask.value
     } else {
       isBrowseOpen.value = false
@@ -59,18 +62,37 @@ const closeModals = () => {
   router.push('/')
 }
 
-const handleAddTask = (newTaskData) => {
-  const newTask = {
-    id: tasks.value.length ? Math.max(...tasks.value.map((t) => t.id)) + 1 : 1,
-    topic: newTaskData.topic || 'Web Design',
-    title: newTaskData.title || 'Новая задача',
-    description: newTaskData.description || '',
-    date: newTaskData.date || new Date().toLocaleDateString('ru-RU'),
-    status: 'Без статуса',
-  }
-
-  tasks.value.push(newTask)
+const handleAddTask = async (newTaskData) => {
   closeModals()
+
+  try {
+    isLoading.value = true
+    errorMessage.value = ''
+
+    const taskObj = {
+      title: newTaskData.title ? String(newTaskData.title).trim() : 'Новая задача',
+      topic: newTaskData.topic ? String(newTaskData.topic).trim() : 'Research',
+      status: 'Без статуса',
+      description: newTaskData.description ? String(newTaskData.description).trim() : '',
+      date: newTaskData.date ? new Date(newTaskData.date).toISOString() : new Date().toISOString(),
+    }
+
+    const testToken = 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k'
+
+    const updatedTasks = await postTask({
+      token: testToken,
+      task: taskObj,
+    })
+
+    if (updatedTasks) {
+      tasks.value = updatedTasks
+    }
+  } catch (error) {
+    console.error('Ошибка при создании задачи:', error)
+    errorMessage.value = error.message || 'Не удалось создать задачу на сервере.'
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const currentUser = ref({
@@ -80,30 +102,105 @@ const currentUser = ref({
 
 const isLoading = ref(true)
 const { initTheme } = useTheme()
+const getTask = async () => {
+  try {
+    isLoading.value = true
+    errorMessage.value = ''
+
+    const data = await fetchTask({
+      token: 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k',
+    })
+
+    if (data) {
+      tasks.value = data
+      console.log('Зфдачи скачаны:', tasks.value)
+    }
+  } catch (err) {
+    errorMessage.value = err.message || 'Не удалось загрузить задачи с сервера.'
+    console.error('Ошибка в функции getTask:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 onMounted(() => {
   initTheme()
 
-  setTimeout(() => {
-    isLoading.value = false
-  }, 3000)
+  getTask()
 })
 
 const openTaskModal = (id) => {
-  router.push(`/card/${id}`)
-}
+  selectedTask.value = tasks.value.find((t) => t._id === id)
 
-const handleUpdateTask = (updatedTask) => {
-  const index = tasks.value.findIndex((t) => t.id === updatedTask.id)
-  if (index !== -1) {
-    tasks.value[index] = updatedTask
+  if (selectedTask.value) {
+    router.push(`/card/${id}`)
   }
-  closeModals()
 }
 
-const handleBasketTask = (taskId) => {
-  tasks.value = tasks.value.filter((t) => t.id !== taskId)
+const handleUpdateTask = async (updatedTask) => {
   closeModals()
+
+  try {
+    isLoading.value = true
+    errorMessage.value = ''
+
+    const taskObj = {
+      title: updatedTask.title,
+      topic: updatedTask.topic,
+      status: updatedTask.status,
+      description: updatedTask.description,
+      date: updatedTask.date ? new Date(updatedTask.date).toISOString() : new Date().toISOString()
+    }
+
+    const testToken = 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k'
+
+    const updatedTasksFromServer = await editTask({
+      token: testToken,
+      id: updatedTask._id,
+      task: taskObj
+    })
+
+    if (updatedTasksFromServer) {
+      tasks.value = updatedTasksFromServer
+    }
+
+  } catch (error) {
+    console.error('Ошибка при обновлении задачи на бэкенде:', error)
+    errorMessage.value = error.message || 'Не удалось сохранить изменения задачи.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleBasketTask = async (taskId) => {
+  closeModals()
+
+  if (!taskId) {
+    console.error('Ошибка: Попытка удалить задачу с пустым ID!')
+    return
+  }
+
+  try {
+    isLoading.value = true
+    errorMessage.value = ''
+
+    const testToken = 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k'
+
+    const updatedTasksFromServer = await deleteTask({
+      token: testToken,
+      id: taskId
+    })
+
+    if (updatedTasksFromServer) {
+      tasks.value = updatedTasksFromServer
+    }
+
+  } catch (error) {
+    console.error('Ошибка при удалении задачи на бэкенде:', error)
+    errorMessage.value = error.message || 'Не удалось удалить задачу на сервере.'
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 

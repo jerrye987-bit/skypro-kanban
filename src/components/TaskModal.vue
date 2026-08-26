@@ -14,7 +14,14 @@
 
             <h3 v-else class="pop-browse__ttl">{{ task?.title }}</h3>
 
-            <div :class="['categories__theme', 'theme-top', getCategoryColorClass(task?.topic), '_active-category']">
+            <div
+              :class="[
+                'categories__theme',
+                'theme-top',
+                getCategoryColorClass(task?.topic),
+                '_active-category',
+              ]"
+            >
               <p :class="getCategoryColorClass(task?.topic)">{{ task?.topic || 'Web Design' }}</p>
             </div>
           </div>
@@ -152,7 +159,9 @@
           <!-- Нижняя категория -->
           <div class="theme-down__categories theme-down">
             <p class="categories__p subttl">Категория</p>
-            <div :class="['categories__theme', getCategoryColorClass(task?.topic), '_active-category']">
+            <div
+              :class="['categories__theme', getCategoryColorClass(task?.topic), '_active-category']"
+            >
               <p :class="getCategoryColorClass(task?.topic)">{{ task?.topic || 'Web Design' }}</p>
             </div>
           </div>
@@ -163,7 +172,10 @@
               <button class="btn-browse__edit _btn-bor _hover03" @click="isEditing = true">
                 Редактировать задачу
               </button>
-              <button class="btn-browse__delete _btn-bor _hover03" @click="$emit('delete-task', task.id)">
+              <button
+                class="btn-browse__delete _btn-bor _hover03"
+                @click="$emit('delete-task', task._id)"
+              >
                 Удалить задачу
               </button>
             </div>
@@ -181,7 +193,10 @@
               <button class="btn-edit__edit _btn-bor _hover03" @click="cancelEditing">
                 Отменить
               </button>
-              <button class="btn-edit__delete _btn-bor _hover03" @click="$emit('delete-task', task.id)">
+              <button
+                class="btn-edit__delete _btn-bor _hover03"
+                @click="$emit('delete-task', task._id)"
+              >
                 Удалить задачу
               </button>
             </div>
@@ -194,62 +209,66 @@
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
-  const props = defineProps({
-    task: {
-      type: Object,
-      required: true
-    }
-  })
+const props = defineProps({
+  task: {
+    type: Object,
+    required: true,
+  },
+})
 
-  const emit = defineEmits(['close', 'update-task', 'delete-task'])
+const emit = defineEmits(['close', 'update-task', 'delete-task'])
 
-  const isEditing = ref(false)
+const isEditing = ref(false)
 
-  const editedTitle = ref('')
-  const editedDescription = ref('')
-  const editedStatus = ref('')
+const editedTitle = ref('')
+const editedDescription = ref('')
+const editedStatus = ref('')
 
-  const statuses = ['Без статуса', 'Нужно сделать', 'В работе', 'Тестирование', 'Готово']
+const statuses = ['Без статуса', 'Нужно сделать', 'В работе', 'Тестирование', 'Готово']
 
-  watch(() => props.task, (newTask) => {
+watch(
+  () => props.task,
+  (newTask) => {
     if (newTask) {
       editedTitle.value = newTask.title || ''
       editedDescription.value = newTask.description || ''
       editedStatus.value = newTask.status || 'Без статуса'
       isEditing.value = false
     }
-  }, { immediate: true })
+  },
+  { immediate: true },
+)
 
-  const cancelEditing = () => {
-    editedTitle.value = props.props?.task?.title || ''
-    editedDescription.value = props.task?.description || ''
-    editedStatus.value = props.task?.status || 'Без статуса'
-    isEditing.value = false
-  }
+const cancelEditing = () => {
+  editedTitle.value = props.props?.task?.title || ''
+  editedDescription.value = props.task?.description || ''
+  editedStatus.value = props.task?.status || 'Без статуса'
+  isEditing.value = false
+}
 
-  const saveChanges = () => {
-    if (!editedTitle.value.trim()) return
+const saveChanges = () => {
+  if (!editedTitle.value.trim()) return
 
-    emit('update-task', {
-      ...props.task,
-      title: editedTitle.value,
-      description: editedDescription.value,
-      status: editedStatus.value
-    })
-    isEditing.value = false
-  }
+  emit('update-task', {
+    ...props.task,
+    title: editedTitle.value,
+    description: editedDescription.value,
+    status: editedStatus.value,
+  })
+  isEditing.value = false
+}
 
-  const getCategoryColorClass = (topicName) => {
-    if (!topicName) return '_orange'
+const getCategoryColorClass = (topicName) => {
+  if (!topicName) return '_orange'
 
-    const text = topicName.toLowerCase()
+  const text = topicName.toLowerCase()
 
-    if (text.includes('web') || text.includes('design') || text.includes('дизайн')) return '_orange'
-    if (text.includes('copy') || text.includes('text') || text.includes('текст')) return '_purple'
-    return '_green'
-  }
+  if (text.includes('web') || text.includes('design') || text.includes('дизайн')) return '_orange'
+  if (text.includes('copy') || text.includes('text') || text.includes('текст')) return '_purple'
+  return '_green'
+}
 </script>
 
 <style lang="scss" scoped>
@@ -368,10 +387,10 @@
   letter-spacing: -0.14px;
 }
 ._active-status {
-  background-color: #94A6BE !important;
-  color: #FFFFFF !important;
+  background-color: #94a6be !important;
+  color: #ffffff !important;
   p {
-    color: #FFFFFF !important;
+    color: #ffffff !important;
   }
 }
 
@@ -410,7 +429,7 @@
   font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
 }
 .form-browse__input-title {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 700;
   line-height: 30px;

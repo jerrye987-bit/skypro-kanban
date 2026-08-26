@@ -128,24 +128,33 @@
             <p class="categories__p subttl">Категория</p>
             <div class="categories__themes">
               <div
-                class="categories__theme _orange"
-                :class="{ '_active-category': topic === 'Web Design' }"
+                :class="[
+                  'categories__theme',
+                  '_orange',
+                  { '_active-category': topic === 'Web Design' },
+                ]"
                 @click="topic = 'Web Design'"
               >
                 <p class="_orange">Web Design</p>
               </div>
 
               <div
-                class="categories__theme _green"
-                :class="{ '_active-category': topic === 'Research' }"
+                :class="[
+                  'categories__theme',
+                  '_green',
+                  { '_active-category': topic === 'Research' },
+                ]"
                 @click="topic = 'Research'"
               >
                 <p class="_green">Research</p>
               </div>
 
               <div
-                class="categories__theme _purple"
-                :class="{ '_active-category': topic === 'Copywriting' }"
+                :class="[
+                  'categories__theme',
+                  '_purple',
+                  { '_active-category': topic === 'Copywriting' },
+                ]"
                 @click="topic = 'Copywriting'"
               >
                 <p class="_purple">Copywriting</p>
@@ -153,7 +162,12 @@
             </div>
           </div>
 
-          <button type="submit" form="formNewCard" class="form-new__create _hover01" id="btnCreate">
+          <button
+            type="submit"
+            form="formNewCard"
+            class="form-new__create _hover01"
+            id="btnCreate"
+          >
             Создать задачу
           </button>
         </div>
@@ -176,10 +190,10 @@ const submitForm = () => {
   if (!title.value.trim()) return
 
   emit('add-task', {
-    title: title.value,
-    topic: topic.value,
-    date: date.value,
-    description: description.value
+    title: title.value.trim(),
+    topic: topic.value.trim(),
+    date: date.value ? date.value.trim() : '',
+    description: description.value.trim(),
   })
 
   title.value = ''
