@@ -113,7 +113,6 @@ const getTask = async () => {
 
     if (data) {
       tasks.value = data
-      console.log('Зфдачи скачаны:', tasks.value)
     }
   } catch (err) {
     errorMessage.value = err.message || 'Не удалось загрузить задачи с сервера.'
