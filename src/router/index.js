@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TaskDesk from '@/components/TaskDesk.vue'
-import SignInView from '@/views/SignIn.vue'
-import SignUpView from '@/views/SignUp.vue'
+// import SignInView from '@/views/SignIn.vue'
+// import SignUpView from '@/views/SignUp.vue'
 import NotFoundView from '@/views/NotFound.vue'
 
 const router = createRouter({
@@ -33,14 +33,16 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: SignInView,
-      meta: { requiresGuest: true },
+      component: () => import('@/views/auth.vue'),
+      props: { isSignUp: false },
+      meta: { requiresGuest: true }
     },
 
     {
       path: '/register',
       name: 'register',
-      component: SignUpView,
+      component: () => import('@/views/auth.vue'),
+      props: { isSignUp: true },
       meta: { requiresGuest: true },
     },
 

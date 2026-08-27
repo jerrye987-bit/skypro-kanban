@@ -162,12 +162,7 @@
             </div>
           </div>
 
-          <button
-            type="submit"
-            form="formNewCard"
-            class="form-new__create _hover01"
-            id="btnCreate"
-          >
+          <button type="submit" form="formNewCard" class="form-new__create _hover01" id="btnCreate">
             Создать задачу
           </button>
         </div>

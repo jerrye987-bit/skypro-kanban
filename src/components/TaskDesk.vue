@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// import { initialTasks } from '@/mocks/tasks.js'
 import { useTheme } from '@/composables/useTheme.js'
 
 import BaseHeader from '@/components/BaseHeader.vue'
@@ -73,14 +72,17 @@ const handleAddTask = async (newTaskData) => {
       title: newTaskData.title ? String(newTaskData.title).trim() : 'Новая задача',
       topic: newTaskData.topic ? String(newTaskData.topic).trim() : 'Research',
       status: 'Без статуса',
-      description: newTaskData.description ? String(newTaskData.description).trim() : '',
+      description: newTaskData.description && String(newTaskData.description).trim() !== ''
+        ? String(newTaskData.description).trim()
+        : 'Описание отсутствует',
       date: newTaskData.date ? new Date(newTaskData.date).toISOString() : new Date().toISOString(),
     }
 
-    const testToken = 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k'
+    const userData = JSON.parse(localStorage.getItem('user'))
+    const activeToken = userData?.token
 
     const updatedTasks = await postTask({
-      token: testToken,
+      token: activeToken,
       task: taskObj,
     })
 
@@ -95,20 +97,26 @@ const handleAddTask = async (newTaskData) => {
   }
 }
 
-const currentUser = ref({
-  name: 'Ivan Ivanov',
-  email: 'ivan.ivanov@gmail.com',
-})
+const getLoggedUser = () => {
+  const savedUser = localStorage.getItem('user')
+  return savedUser ? JSON.parse(savedUser) : { name: 'Гость', email: '' }
+}
+
+const currentUser = ref(getLoggedUser())
 
 const isLoading = ref(true)
 const { initTheme } = useTheme()
+
 const getTask = async () => {
   try {
     isLoading.value = true
     errorMessage.value = ''
 
+    const userData = JSON.parse(localStorage.getItem('user'))
+    const activeToken = userData?.token
+
     const data = await fetchTask({
-      token: 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k',
+      token: activeToken,
     })
 
     if (data) {
@@ -148,21 +156,21 @@ const handleUpdateTask = async (updatedTask) => {
       topic: updatedTask.topic,
       status: updatedTask.status,
       description: updatedTask.description,
-      date: updatedTask.date ? new Date(updatedTask.date).toISOString() : new Date().toISOString()
+      date: updatedTask.date ? new Date(updatedTask.date).toISOString() : new Date().toISOString(),
     }
 
-    const testToken = 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k'
+    const userData = JSON.parse(localStorage.getItem('user'))
+    const activeToken = userData?.token
 
     const updatedTasksFromServer = await editTask({
-      token: testToken,
+      token: activeToken,
       id: updatedTask._id,
-      task: taskObj
+      task: taskObj,
     })
 
     if (updatedTasksFromServer) {
       tasks.value = updatedTasksFromServer
     }
-
   } catch (error) {
     console.error('Ошибка при обновлении задачи на бэкенде:', error)
     errorMessage.value = error.message || 'Не удалось сохранить изменения задачи.'
@@ -183,17 +191,17 @@ const handleBasketTask = async (taskId) => {
     isLoading.value = true
     errorMessage.value = ''
 
-    const testToken = 'asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k'
+    const userData = JSON.parse(localStorage.getItem('user'))
+    const activeToken = userData?.token
 
     const updatedTasksFromServer = await deleteTask({
-      token: testToken,
-      id: taskId
+      token: activeToken,
+      id: taskId,
     })
 
     if (updatedTasksFromServer) {
       tasks.value = updatedTasksFromServer
     }
-
   } catch (error) {
     console.error('Ошибка при удалении задачи на бэкенде:', error)
     errorMessage.value = error.message || 'Не удалось удалить задачу на сервере.'
@@ -324,17 +332,27 @@ const handleBasketTask = async (taskId) => {
       @delete-task="handleBasketTask"
     />
 
-    <ExitModal v-if="isExitOpen" :user="currentUser" @close="closeModals" />
+    <ExitModal
+      v-if="$route.path === '/exit' && $route.hash !== '#confirm'"
+      :user="currentUser"
+      @close="closeModals"
+    />
 
-    <ExitExitModal v-if="isConfirmExitOpen" @close="closeModals" @confirm="handleLogout" />
+    <ExitExitModal
+      v-if="$route.path === '/exit' && $route.hash === '#confirm'"
+      @close="router.push('/exit')"
+      @confirm="handleLogout"
+    />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .task-desk__grid {
   display: flex;
+  justify-content: space-between;
   gap: 20px;
   align-items: flex-start;
+  width: 100%;
   padding: 40px 135px 40px 129px;
   overflow-x: auto;
   background: #eaeef6;

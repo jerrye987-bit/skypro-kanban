@@ -36,55 +36,51 @@ export async function fetchTaskById({ id, token }) {
 
 // Добавление задачи
 export async function postTask({ token, task }) {
-   try {
+  try {
+    const data = await axios.post(API_URL, task, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': '',
+      },
+    })
 
-      const data = await axios.post(API_URL, task, {
-         headers: {
-            Authorization: 'Bearer ' + token,
-            'Content-Type': '',
-         },
-      })
-
-      return data.data.tasks
-
-   } catch (error) {
-      const errorMessage = error.response?.data?.error || error.message
-      throw new Error(errorMessage, { cause: error})
-   }
+    return data.data.tasks
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || error.message
+    throw new Error(errorMessage, { cause: error })
+  }
 }
 
 // Изменение задачи
 export async function editTask({ token, id, task }) {
-   try {
-      const data = await axios.put(`${API_URL}/${id}`, task, {
-         headers: {
-            Authorization: 'Bearer ' + token,
-            'Content-Type': '',
-         },
-      })
+  try {
+    const data = await axios.put(`${API_URL}/${id}`, task, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': '',
+      },
+    })
 
-      return data.data.tasks
-
-   } catch (error) {
-      const errorMessage = error.response?.data?.error || error.message
-      throw new Error(errorMessage, { cause: error })
-   }
+    return data.data.tasks
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || error.message
+    throw new Error(errorMessage, { cause: error })
+  }
 }
 
 // Удаление задачи
 export async function deleteTask({ token, id }) {
-   try {
-      const data = await axios.delete(`${API_URL}/${id}`, {
-         headers: {
-            Authorization: 'Bearer ' + token,
-            'Content-Type': '',
-         },
-      })
+  try {
+    const data = await axios.delete(`${API_URL}/${id}`, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': '',
+      },
+    })
 
-      return data.data.tasks
-
-   } catch (error) {
-      const errorMessage = error.response?.data?.error || error.message
-      throw new Error(errorMessage, { cause: error })
-   }
+    return data.data.tasks
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || error.message
+    throw new Error(errorMessage, { cause: error })
+  }
 }
