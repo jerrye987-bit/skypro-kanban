@@ -712,7 +712,9 @@
   display: flex;
 }
 .main__column {
-  width: 20%;
+  width: 100%;
+  max-width: 360px;
+  min-width: 280px;
   margin: 0 auto;
   display: block;
 }

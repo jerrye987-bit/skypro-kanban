@@ -14,6 +14,17 @@ const getThemeClass = (topic) => {
   if (topic === 'Copywriting') return '_purple'
   return '_orange'
 }
+
+const formatDateShort = (dateString) => {
+  if (!dateString) return '—'
+  const date = new Date(dateString)
+
+  return date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
+  })
+}
 </script>
 
 <style lang="scss" scoped></style>
@@ -28,7 +39,7 @@ const getThemeClass = (topic) => {
           </div>
         </slot>
 
-        <a href="#popBrowse" target="_self" @click.prevent="$emit('open-task', task.id)">
+        <a href="#popBrowse" target="_self" @click.prevent="$emit('open-task', task._id)">
           <div class="card__btn">
             <div></div>
             <div></div>
@@ -38,7 +49,7 @@ const getThemeClass = (topic) => {
       </div>
 
       <div class="card__content">
-        <a href="#" @click.prevent="$emit('open-task', task.id)">
+        <a href="#" @click.prevent="$emit('open-task', task._id)">
           <slot name="title">
             <h3 :class="task.status === 'Готово' ? 'card__title_completed' : 'card__title'">
               {{ task.title }}
@@ -75,7 +86,7 @@ const getThemeClass = (topic) => {
               </clipPath>
             </defs>
           </svg>
-          <p>{{ task.date }}</p>
+          <p>{{ formatDateShort(task.date) }}</p>
         </div>
       </div>
     </div>

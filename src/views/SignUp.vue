@@ -79,6 +79,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { signUp } from '@/services/auth.js'
 
 const router = useRouter()
 
@@ -112,7 +113,7 @@ const clearFieldError = () => {
   }
 }
 
-const handleSignUp = () => {
+const handleSignUp = async () => {
   if (!name.value.trim() || !email.value.trim() || !password.value.trim()) {
     isValidationFailed.value = true
     errorMessage.value = 'Заполните все поля'
@@ -125,15 +126,21 @@ const handleSignUp = () => {
     return
   }
 
-  localStorage.setItem(
-    'user',
-    JSON.stringify({
-      name: name.value,
-      email: email.value,
-    }),
-  )
+  try {
+    const userFromServer = await signUp({
+      name: name.value.trim(),
+      login: email.value.trim(),
+      password: password.value.trim(),
+    })
 
-  router.push('/')
+    localStorage.setItem('user', JSON.stringify(userFromServer))
+
+    router.push('/')
+  } catch (error) {
+    console.error('Ошибка регистрации через API:', error)
+    isValidationFailed.value = true
+    errorMessage.value = error.message || 'Не удалось зарегистрироваться.'
+  }
 }
 </script>
 

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TaskDesk from '@/components/TaskDesk.vue'
-import SignInView from '@/views/SignIn.vue'
-import SignUpView from '@/views/SignUp.vue'
+// import SignInView from '@/views/SignIn.vue'
+// import SignUpView from '@/views/SignUp.vue'
 import NotFoundView from '@/views/NotFound.vue'
 
 const router = createRouter({
@@ -16,32 +16,34 @@ const router = createRouter({
         {
           path: 'exit',
           name: 'exit',
-          component: TaskDesk
+          component: TaskDesk,
         },
         {
           path: 'card/:id',
           name: 'card-detail',
-          component: TaskDesk
+          component: TaskDesk,
         },
         {
           path: 'new-card',
           name: 'new-card',
-          component: TaskDesk
-        }
-      ]
+          component: TaskDesk,
+        },
+      ],
     },
     {
       path: '/login',
       name: 'login',
-      component: SignInView,
-      meta: { requiresGuest: true }
+      component: () => import('@/views/auth.vue'),
+      props: { isSignUp: false },
+      meta: { requiresGuest: true },
     },
 
     {
       path: '/register',
       name: 'register',
-      component: SignUpView,
-      meta: { requiresGuest: true }
+      component: () => import('@/views/auth.vue'),
+      props: { isSignUp: true },
+      meta: { requiresGuest: true },
     },
 
     {
@@ -52,28 +54,24 @@ const router = createRouter({
 
     {
       path: '/:pathMatch(.*)*',
-      redirect:'/404'
-    }
+      redirect: '/404',
+    },
   ],
 })
 
 router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('user')
 
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  const requiresGuest = to.matched.some(record => record.meta.requiresGuest)
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest)
 
   if (requiresAuth && !isAuthenticated) {
-    console.warn ('Доступ запрещен! Перенаправление на страницу входа.')
+    console.warn('Доступ запрещен! Перенаправление на страницу входа.')
     next('/login')
-  }
-
-  else if (requiresGuest && isAuthenticated) {
+  } else if (requiresGuest && isAuthenticated) {
     console.info('Пользователь уже авторизован. Перенаправление на главную')
     next('/')
-  }
-
-  else {
+  } else {
     next()
   }
 })

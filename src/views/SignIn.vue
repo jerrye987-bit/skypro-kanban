@@ -68,6 +68,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { signIn } from '@/services/auth.js'
 
 const router = useRouter()
 
@@ -96,7 +97,7 @@ const clearFieldError = () => {
   }
 }
 
-const handleLogin = () => {
+const handleLogin = async () => {
   errorMessage.value = ''
   isValidationFailed.value = false
 
@@ -106,18 +107,19 @@ const handleLogin = () => {
     return
   }
 
-  if (email.value === 'ivan.ivanov@gmail.com' && password.value === '123456') {
-    localStorage.setItem(
-      'user',
-      JSON.stringify({
-        name: 'Ivan Ivanov',
-        email: email.value,
-      }),
-    )
+  try {
+    const userFromServer = await signIn({
+      login: email.value.trim(),
+      password: password.value.trim(),
+    })
+
+    localStorage.setItem('user', JSON.stringify(userFromServer))
+
     router.push('/')
-  } else {
+  } catch (error) {
+    console.error('Ошибка входа через API:', error)
     isValidationFailed.value = true
-    errorMessage.value = 'Неверный логин или пароль'
+    errorMessage.value = error.message || 'Неверный логин или пароль'
   }
 }
 </script>

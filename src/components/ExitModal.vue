@@ -2,25 +2,10 @@
   <div class="pop-exit" @click="$emit('close')">
     <div class="pop-exit__container">
       <div class="pop-exit__block pop-user-set" @click.stop>
-        <button
-          class="pop-exit__close-btn"
-          @click="$emit('close')"
-          style="
-            position: absolute;
-            top: 5px;
-            right: -15px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #94a6be;
-          "
-        >
-          &times;
-        </button>
+        <button class="pop-exit__close-btn" @click="$emit('close')">&times;</button>
 
         <p class="pop-user-set__name">{{ user.name }}</p>
-        <p class="pop-user-set__mail">{{ user.email }}</p>
+        <p class="pop-user-set__mail">{{ user.login }}</p>
 
         <div class="pop-user-set__theme">
           <p>Темная тема</p>
@@ -35,9 +20,7 @@
 
         <div class="pop-exit__form-group">
           <router-link to="/exit#confirm" custom v-slot="{ navigate }">
-            <button @click="navigate" class="pop-user-set__btn _hover03">
-              Выйти
-            </button>
+            <button @click="navigate" class="pop-user-set__btn _hover03">Выйти</button>
           </router-link>
         </div>
       </div>
@@ -118,16 +101,31 @@ const { isDark, toggleTheme } = useTheme()
 .pop-user-set__theme input:checked[type='checkbox']::before {
   left: 12px;
 }
-.pop-user-set button {
+.pop-user-set__btn {
   width: 100%;
   max-width: 72px;
   height: 30px;
   background: transparent;
   color: #565eef;
   border-radius: 4px;
-  border: 1px solid #565eef;
+  border: 1px solid #565eef !important;
+}
+.pop-user-set__btn:hover {
+  background: #565eef !important;
+  color: #ffffff !important;
 }
 .pop-user-set button a {
   color: #565eef;
+}
+
+.pop-exit__close-btn {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #94a6be;
 }
 </style>

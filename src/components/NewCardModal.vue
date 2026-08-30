@@ -36,10 +36,11 @@
             <div class="pop-new-card__calendar calendar">
               <p class="calendar__ttl subttl">Даты</p>
               <div class="calendar__block">
+
                 <div class="calendar__nav">
-                  <div class="calendar__month">Сентябрь 2023</div>
+                  <div class="calendar__month">{{ currentMonthName }}</div>
                   <div class="nav__actions">
-                    <div class="nav__action" data-action="prev">
+                    <div class="nav__action" @click="prevMonth" style="cursor: pointer;">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -51,7 +52,7 @@
                         />
                       </svg>
                     </div>
-                    <div class="nav__action" data-action="next">
+                    <div class="nav__action" @click="nextMonth" style="cursor: pointer;">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -77,47 +78,32 @@
                     <div class="calendar__day-name -weekend-">вс</div>
                   </div>
                   <div class="calendar__cells">
-                    <div class="calendar__cell _other-month">28</div>
-                    <div class="calendar__cell _other-month">29</div>
-                    <div class="calendar__cell _other-month">30</div>
-                    <div class="calendar__cell _cell-day">31</div>
-                    <div class="calendar__cell _cell-day">1</div>
-                    <div class="calendar__cell _cell-day _weekend">2</div>
-                    <div class="calendar__cell _cell-day _weekend">3</div>
-                    <div class="calendar__cell _cell-day">4</div>
-                    <div class="calendar__cell _cell-day">5</div>
-                    <div class="calendar__cell _cell-day">6</div>
-                    <div class="calendar__cell _cell-day">7</div>
-                    <div class="calendar__cell _cell-day _current">8</div>
-                    <div class="calendar__cell _cell-day _weekend">9</div>
-                    <div class="calendar__cell _cell-day _weekend">10</div>
-                    <div class="calendar__cell _cell-day">11</div>
-                    <div class="calendar__cell _cell-day">12</div>
-                    <div class="calendar__cell _cell-day">13</div>
-                    <div class="calendar__cell _cell-day">14</div>
-                    <div class="calendar__cell _cell-day">15</div>
-                    <div class="calendar__cell _cell-day _weekend">16</div>
-                    <div class="calendar__cell _cell-day _weekend">17</div>
-                    <div class="calendar__cell _cell-day">18</div>
-                    <div class="calendar__cell _cell-day">19</div>
-                    <div class="calendar__cell _cell-day">20</div>
-                    <div class="calendar__cell _cell-day">21</div>
-                    <div class="calendar__cell _cell-day">22</div>
-                    <div class="calendar__cell _cell-day _weekend">23</div>
-                    <div class="calendar__cell _cell-day _weekend">24</div>
-                    <div class="calendar__cell _cell-day">25</div>
-                    <div class="calendar__cell _cell-day">26</div>
-                    <div class="calendar__cell _cell-day">27</div>
-                    <div class="calendar__cell _cell-day">28</div>
-                    <div class="calendar__cell _cell-day">29</div>
-                    <div class="calendar__cell _cell-day _weekend">30</div>
-                    <div class="calendar__cell _other-month _weekend">1</div>
+                    <div
+                      v-for="(cell, index) in calendarCells"
+                      :key="index"
+                      :class="[
+                        'calendar__cell',
+                        { '_cell-day': cell.isCurrentMonth },
+                        { '_other-month': !cell.isCurrentMonth },
+                        { '_active-day': isSelectedDay(cell) },
+                        { '_current': isTodayCell(cell) },
+                        { '_weekend': isWeekend(cell) },
+                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) }
+                      ]"
+                      :style="{ cursor: (cell.isCurrentMonth && !isDayInPast(cell)) ? 'pointer' : 'default' }"
+                      @click="selectDate(cell)"
+                    >
+                      {{ cell.day }}
+                    </div>
                   </div>
                 </div>
 
                 <div class="calendar__period">
                   <p class="calendar__p date-end">
-                    Срок исполнения: <span class="date-control"></span>
+                    Срок исполнения:
+                    <span class="date-control" style="color: black; font-weight: 500; margin-left: 4px;">
+                      {{ formatDateShort(taskDate) }}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -128,24 +114,33 @@
             <p class="categories__p subttl">Категория</p>
             <div class="categories__themes">
               <div
-                class="categories__theme _orange"
-                :class="{ '_active-category': topic === 'Web Design' }"
+                :class="[
+                  'categories__theme',
+                  '_orange',
+                  { '_active-category': topic === 'Web Design' },
+                ]"
                 @click="topic = 'Web Design'"
               >
                 <p class="_orange">Web Design</p>
               </div>
 
               <div
-                class="categories__theme _green"
-                :class="{ '_active-category': topic === 'Research' }"
+                :class="[
+                  'categories__theme',
+                  '_green',
+                  { '_active-category': topic === 'Research' },
+                ]"
                 @click="topic = 'Research'"
               >
                 <p class="_green">Research</p>
               </div>
 
               <div
-                class="categories__theme _purple"
-                :class="{ '_active-category': topic === 'Copywriting' }"
+                :class="[
+                  'categories__theme',
+                  '_purple',
+                  { '_active-category': topic === 'Copywriting' },
+                ]"
                 @click="topic = 'Copywriting'"
               >
                 <p class="_purple">Copywriting</p>
@@ -163,28 +158,133 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const emit = defineEmits(['close', 'add-task'])
 
 const title = ref('')
 const description = ref('')
-const date = ref('')
 const topic = ref('Web Design')
 
+const taskDate = ref(new Date())
+
+const today = new Date()
+const currentYear = ref(today.getFullYear())
+const currentMonth = ref(today.getMonth())
+
+const monthNames = [
+  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+]
+
+const currentMonthName = computed(() => {
+  return `${monthNames[currentMonth.value]} ${currentYear.value}`
+})
+
+// Вычисляем массив ячеек для сетки календаря
+const calendarCells = computed(() => {
+  const cells = []
+  const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1)
+  const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+
+  let startDayOfWeek = firstDayOfMonth.getDay()
+  startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1
+
+  const daysInPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
+  for (let i = startDayOfWeek - 1; i >= 0; i--) {
+    cells.push({ day: daysInPrevMonth - i, isCurrentMonth: false, date: null })
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    cells.push({
+      day,
+      isCurrentMonth: true,
+      date: new Date(currentYear.value, currentMonth.value, day)
+    })
+  }
+  return cells
+})
+
+const prevMonth = () => {
+  if (currentMonth.value === 0) {
+    currentMonth.value = 11
+    currentYear.value--
+  } else {
+    currentMonth.value--
+  }
+}
+
+const nextMonth = () => {
+  if (currentMonth.value === 11) {
+    currentMonth.value = 0
+    currentYear.value++
+  } else {
+    currentMonth.value++
+  }
+}
+
+const selectDate = (cell) => {
+  // Блокируем клики по дням из прошлого и чужих месяцев
+  if (!cell.isCurrentMonth || isDayInPast(cell)) return
+  taskDate.value = cell.date
+}
+
+// Проверки для стилей ячеек
+const isSelectedDay = (cell) => {
+  if (!cell.isCurrentMonth || !cell.date) return false
+  return cell.date.toDateString() === taskDate.value.toDateString()
+}
+
+const isTodayCell = (cell) => {
+  if (!cell.isCurrentMonth || !cell.date) return false
+  return cell.date.toDateString() === today.toDateString()
+}
+
+const isWeekend = (cell) => {
+  if (!cell.date) return false
+  const dayOfWeek = cell.date.getDay()
+  return dayOfWeek === 0 || dayOfWeek === 6
+}
+
+const isDayInPast = (cell) => {
+  if (!cell.date) return false
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const cellDateStart = new Date(cell.date)
+  cellDateStart.setHours(0, 0, 0, 0)
+  return cellDateStart.getTime() < todayStart.getTime()
+}
+
+// 🚀 ФУНКЦИЯ ФОРМАТИРОВАНИЯ ДЛЯ ВЫВОДА СРОКА НА ЭКРАН (30.08.26)
+const formatDateShort = (date) => {
+  return date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
+  })
+}
+
+// 🚀 МЕТОД ОТПРАВКИ ФОРМЫ
 const submitForm = () => {
   if (!title.value.trim()) return
 
+  // Перед отправкой принудительно фиксируем время на 12:00 дня для защиты от сдвига поясов
+  const safeDate = new Date(taskDate.value)
+  safeDate.setHours(12, 0, 0, 0)
+
   emit('add-task', {
-    title: title.value,
-    topic: topic.value,
-    date: date.value,
-    description: description.value
+    title: title.value.trim(),
+    topic: topic.value.trim(),
+    description: description.value.trim(),
+    // Отправляем готовую ISO-строку с датой родителю!
+    date: safeDate.toISOString()
   })
 
+  // Сбрасываем форму
   title.value = ''
   description.value = ''
   topic.value = 'Web Design'
+  taskDate.value = new Date()
 }
 </script>
 
