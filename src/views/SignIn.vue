@@ -110,13 +110,12 @@ const handleLogin = async () => {
   try {
     const userFromServer = await signIn({
       login: email.value.trim(),
-      password: password.value.trim()
+      password: password.value.trim(),
     })
 
     localStorage.setItem('user', JSON.stringify(userFromServer))
 
     router.push('/')
-
   } catch (error) {
     console.error('Ошибка входа через API:', error)
     isValidationFailed.value = true

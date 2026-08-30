@@ -72,9 +72,10 @@ const handleAddTask = async (newTaskData) => {
       title: newTaskData.title ? String(newTaskData.title).trim() : 'Новая задача',
       topic: newTaskData.topic ? String(newTaskData.topic).trim() : 'Research',
       status: 'Без статуса',
-      description: newTaskData.description && String(newTaskData.description).trim() !== ''
-        ? String(newTaskData.description).trim()
-        : 'Описание отсутствует',
+      description:
+        newTaskData.description && String(newTaskData.description).trim() !== ''
+          ? String(newTaskData.description).trim()
+          : 'Описание отсутствует',
       date: newTaskData.date ? new Date(newTaskData.date).toISOString() : new Date().toISOString(),
     }
 

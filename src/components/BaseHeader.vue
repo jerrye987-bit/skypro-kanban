@@ -72,7 +72,7 @@ defineEmits(['open-profile'])
 .header {
   width: 100%;
   margin: 0 auto;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -106,8 +106,8 @@ defineEmits(['open-profile'])
   width: 178px;
   height: 30px;
   border-radius: 4px;
-  background-color: #565EEF;
-  color: #FFFFFF;
+  background-color: #565eef;
+  color: #ffffff;
   border: none;
   font-size: 14px;
   line-height: 1;
@@ -115,7 +115,7 @@ defineEmits(['open-profile'])
   margin-right: 20px;
 }
 .header__btn-main-new a {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .header__user {
@@ -126,16 +126,16 @@ defineEmits(['open-profile'])
   justify-content: center;
   font-size: 14px;
   line-height: 20px;
-  color: #565EEF;
+  color: #565eef;
 }
 .header__user::after {
-  content: "";
+  content: '';
   display: block;
   width: 6px;
   height: 6px;
   border-radius: 1px;
-  border-left: 1.9px solid #565EEF;
-  border-bottom: 1.9px solid #565EEF;
+  border-left: 1.9px solid #565eef;
+  border-bottom: 1.9px solid #565eef;
   transform: rotate(-45deg);
   margin: -6px 0 0 5px;
   padding: 0;
@@ -149,7 +149,7 @@ defineEmits(['open-profile'])
   height: 205px;
   border-radius: 10px;
   border: 0.7px solid rgba(148, 166, 190, 0.4);
-  background: #FFF;
+  background: #fff;
   box-shadow: 0px 10px 39px 0px rgba(26, 56, 101, 0.21);
   padding: 34px;
   text-align: center;

@@ -127,16 +127,15 @@ const handleSignUp = async () => {
   }
 
   try {
-      const userFromServer = await signUp({
+    const userFromServer = await signUp({
       name: name.value.trim(),
       login: email.value.trim(),
-      password: password.value.trim()
+      password: password.value.trim(),
     })
 
     localStorage.setItem('user', JSON.stringify(userFromServer))
- 
-    router.push('/')
 
+    router.push('/')
   } catch (error) {
     console.error('Ошибка регистрации через API:', error)
     isValidationFailed.value = true

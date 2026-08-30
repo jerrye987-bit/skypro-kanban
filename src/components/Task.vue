@@ -14,6 +14,17 @@ const getThemeClass = (topic) => {
   if (topic === 'Copywriting') return '_purple'
   return '_orange'
 }
+
+const formatDateShort = (dateString) => {
+  if (!dateString) return '—'
+  const date = new Date(dateString)
+
+  return date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
+  })
+}
 </script>
 
 <style lang="scss" scoped></style>
@@ -75,7 +86,7 @@ const getThemeClass = (topic) => {
               </clipPath>
             </defs>
           </svg>
-          <p>{{ task.date }}</p>
+          <p>{{ formatDateShort(task.date) }}</p>
         </div>
       </div>
     </div>

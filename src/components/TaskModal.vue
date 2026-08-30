@@ -48,7 +48,7 @@
             </div>
           </div>
 
-          <!-- Описание задачи и Календарь -->
+          <!-- Описание задачи -->
           <div class="pop-browse__wrap">
             <form class="pop-browse__form form-browse" id="formBrowseCard" @submit.prevent>
               <div class="form-browse__block">
@@ -69,9 +69,9 @@
               <p class="calendar__ttl subttl">Даты</p>
               <div class="calendar__block">
                 <div class="calendar__nav">
-                  <div class="calendar__month">Сентябрь 2023</div>
+                  <div class="calendar__month">{{ currentMonthName }}</div>
                   <div class="nav__actions">
-                    <div class="nav__action" data-action="prev">
+                    <div class="nav__action" @click="prevMonth" style="cursor: pointer;">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -83,7 +83,7 @@
                         />
                       </svg>
                     </div>
-                    <div class="nav__action" data-action="next">
+                    <div class="nav__action" @click="nextMonth" style="cursor: pointer;">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -97,6 +97,7 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="calendar__content">
                   <div class="calendar__days-names">
                     <div class="calendar__day-name">пн</div>
@@ -107,49 +108,35 @@
                     <div class="calendar__day-name -weekend-">сб</div>
                     <div class="calendar__day-name -weekend-">вс</div>
                   </div>
+
                   <div class="calendar__cells">
-                    <div class="calendar__cell _other-month">28</div>
-                    <div class="calendar__cell _other-month">29</div>
-                    <div class="calendar__cell _other-month">30</div>
-                    <div class="calendar__cell _cell-day">31</div>
-                    <div class="calendar__cell _cell-day">1</div>
-                    <div class="calendar__cell _cell-day _weekend">2</div>
-                    <div class="calendar__cell _cell-day _weekend">3</div>
-                    <div class="calendar__cell _cell-day">4</div>
-                    <div class="calendar__cell _cell-day">5</div>
-                    <div class="calendar__cell _cell-day">6</div>
-                    <div class="calendar__cell _cell-day">7</div>
-                    <div class="calendar__cell _cell-day _current">8</div>
-                    <div class="calendar__cell _cell-day _weekend _active-day">9</div>
-                    <div class="calendar__cell _cell-day _weekend">10</div>
-                    <div class="calendar__cell _cell-day">11</div>
-                    <div class="calendar__cell _cell-day">12</div>
-                    <div class="calendar__cell _cell-day">13</div>
-                    <div class="calendar__cell _cell-day">14</div>
-                    <div class="calendar__cell _cell-day">15</div>
-                    <div class="calendar__cell _cell-day _weekend">16</div>
-                    <div class="calendar__cell _cell-day _weekend">17</div>
-                    <div class="calendar__cell _cell-day">18</div>
-                    <div class="calendar__cell _cell-day">19</div>
-                    <div class="calendar__cell _cell-day">20</div>
-                    <div class="calendar__cell _cell-day">21</div>
-                    <div class="calendar__cell _cell-day">22</div>
-                    <div class="calendar__cell _cell-day _weekend">23</div>
-                    <div class="calendar__cell _cell-day _weekend">24</div>
-                    <div class="calendar__cell _cell-day">25</div>
-                    <div class="calendar__cell _cell-day">26</div>
-                    <div class="calendar__cell _cell-day">27</div>
-                    <div class="calendar__cell _cell-day">28</div>
-                    <div class="calendar__cell _cell-day">29</div>
-                    <div class="calendar__cell _cell-day _weekend">30</div>
-                    <div class="calendar__cell _other-month _weekend">1</div>
+                    <div
+                      v-for="(cell, index) in calendarCells"
+                      :key="index"
+                      :class="[
+                        'calendar__cell',
+                        { '_cell-day': cell.isCurrentMonth },
+                        { '_other-month': !cell.isCurrentMonth },
+                        { '_active-day': isSelectedDay(cell) },
+                        { '_current': isToday(cell) },
+                        { '_weekend': isWeekend(cell) },
+                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) }
+                      ]"
+                      :style="{ cursor: (isEditing && cell.isCurrentMonth && !isDayInPast(cell)) ? 'pointer' : 'default' }"
+                       @click="isEditing && cell.isCurrentMonth && !isDayInPast(cell) ? selectDate(cell) : null"
+                    >
+                      {{ cell.day }}
+                    </div>
                   </div>
                 </div>
 
                 <input type="hidden" id="datepick_value" value="08.09.2023" />
                 <div class="calendar__period">
                   <p class="calendar__p date-end">
-                    Срок исполнения: <span class="date-control"></span>
+                    Срок исполнения:
+                    <span class="date-control" style="color: black; font-weight: 500; margin-left: 4px;">
+                      {{ taskDate.toLocaleDateString() }}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -200,7 +187,11 @@
                 Удалить задачу
               </button>
             </div>
-            <button class="btn-edit__close _btn-bg _hover01"><a href="#">Закрыть</a></button>
+            <button
+              class="btn-edit__close _btn-bg _hover01"
+              @click="cancelEditing">
+              <a href="#">Закрыть</a>
+            </button>
           </div>
         </div>
       </div>
@@ -209,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 const props = defineProps({
   task: {
@@ -225,6 +216,102 @@ const isEditing = ref(false)
 const editedTitle = ref('')
 const editedDescription = ref('')
 const editedStatus = ref('')
+
+const taskDate = ref(props.task.date ? new Date(props.task.date) : new Date())
+const today = new Date()
+const isDateInPast = taskDate.value.getTime() < today.getTime()
+
+const currentYear = ref(isDateInPast ? today.getFullYear() : taskDate.value.getFullYear())
+const currentMonth = ref(isDateInPast ? today.getMonth() : taskDate.value.getMonth())
+
+const monthNames = [
+  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+]
+
+const currentMonthName = computed(() => {
+  return `${monthNames[currentMonth.value]} ${currentYear.value}`
+})
+
+const calendarCells = computed(() => {
+  const cells = []
+
+  const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1)
+  const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+
+  let startDayOfWeek = firstDayOfMonth.getDay()
+  startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1
+
+  const daysInPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
+  for (let i = startDayOfWeek - 1; i >= 0; i--) {
+    cells.push({
+      day: daysInPrevMonth - i,
+      isCurrentMonth: false,
+      date: null
+    })
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    cells.push({
+      day,
+      isCurrentMonth: true,
+      date: new Date(currentYear.value, currentMonth.value, day)
+    })
+  }
+
+  return cells
+})
+
+const prevMonth = () => {
+  if (currentMonth.value === 0) {
+    currentMonth.value = 11
+    currentYear.value--
+  } else {
+    currentMonth.value--
+  }
+}
+
+const nextMonth = () => {
+  if (currentMonth.value === 11) {
+    currentMonth.value = 0
+    currentYear.value++
+  } else {
+    currentMonth.value++
+  }
+}
+
+const selectDate = (cell) => {
+  if (!isEditing.value || !cell.isCurrentMonth) return
+  taskDate.value = cell.date
+}
+
+const isSelectedDay = (cell) => {
+  if (!cell.isCurrentMonth || !cell.date) return false
+  return cell.date.toDateString() === taskDate.value.toDateString()
+}
+
+const isToday = (cell) => {
+  if (!cell.isCurrentMonth || !cell.date) return false
+  return cell.date.toDateString() === new Date().toDateString()
+}
+
+const isWeekend = (cell) => {
+  if (!cell.date) return false
+  const dayOfWeek = cell.date.getDay()
+  return dayOfWeek === 0 || dayOfWeek === 6
+}
+
+const isDayInPast = (cell) => {
+  if (!cell.date) return false
+
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+
+  const cellDateStart = new Date(cell.date)
+  cellDateStart.setHours(0, 0, 0, 0)
+
+  return cellDateStart.getTime() < todayStart.getTime()
+}
 
 const statuses = ['Без статуса', 'Нужно сделать', 'В работе', 'Тестирование', 'Готово']
 
@@ -245,17 +332,27 @@ const cancelEditing = () => {
   editedTitle.value = props.props?.task?.title || ''
   editedDescription.value = props.task?.description || ''
   editedStatus.value = props.task?.status || 'Без статуса'
+  taskDate.value = props.task.date ? new Date(props.task.date) : new Date()
+  currentYear.value = taskDate.value.getFullYear()
+  currentMonth.value = taskDate.value.getMonth()
+
   isEditing.value = false
+
+  emit('close')
 }
 
 const saveChanges = () => {
   if (!editedTitle.value.trim()) return
+
+  const safeDate = new Date(taskDate.value)
+  safeDate.setHours(12, 0, 0, 0)
 
   emit('update-task', {
     ...props.task,
     title: editedTitle.value,
     description: editedDescription.value,
     status: editedStatus.value,
+    date: safeDate.toISOString()
   })
   isEditing.value = false
 }

@@ -35,7 +35,7 @@ const router = createRouter({
       name: 'login',
       component: () => import('@/views/auth.vue'),
       props: { isSignUp: false },
-      meta: { requiresGuest: true }
+      meta: { requiresGuest: true },
     },
 
     {

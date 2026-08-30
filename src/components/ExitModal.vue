@@ -2,12 +2,7 @@
   <div class="pop-exit" @click="$emit('close')">
     <div class="pop-exit__container">
       <div class="pop-exit__block pop-user-set" @click.stop>
-        <button
-          class="pop-exit__close-btn"
-          @click="$emit('close')"
-        >
-          &times;
-        </button>
+        <button class="pop-exit__close-btn" @click="$emit('close')">&times;</button>
 
         <p class="pop-user-set__name">{{ user.name }}</p>
         <p class="pop-user-set__mail">{{ user.login }}</p>

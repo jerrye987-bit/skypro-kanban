@@ -143,6 +143,12 @@ body {
   letter-spacing: -0.2px;
   cursor: pointer;
 }
+.calendar__cell._disabled-day {
+  color: #94a6be !important;
+  opacity: 0.35;
+  background: transparent !important;
+  pointer-events: none;
+}
 .calendar__nav {
   width: 100%;
   display: flex;

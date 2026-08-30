@@ -44,10 +44,7 @@
               {{ error }}
             </p>
 
-            <button
-              type="submit"
-              class="modal__btn-signup-ent _hover01"
-            >
+            <button type="submit" class="modal__btn-signup-ent _hover01">
               {{ isSignUp ? 'Зарегистрироваться' : 'Войти' }}
             </button>
 
@@ -331,7 +328,6 @@ async function handleSubmit(event) {
   display: inline !important;
   margin-left: 4px !important;
 }
-
 
 @media screen and (max-width: 375px) {
   .modal {
