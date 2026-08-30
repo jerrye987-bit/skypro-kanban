@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTheme } from '@/composables/useTheme.js'
 
@@ -14,6 +14,8 @@ import ExitExitModal from '@/components/ExitExitModal.vue'
 
 import { fetchTask, postTask, editTask, deleteTask } from '@/services/api.js'
 
+const { user, removeUser } = inject('auth')
+
 const tasks = ref([])
 
 const route = useRoute()
@@ -27,14 +29,8 @@ const isConfirmExitOpen = ref(false)
 const errorMessage = ref('')
 
 const handleLogout = () => {
-  localStorage.removeItem('user')
-
-  if (typeof closeModals === 'function') {
-    closeModals()
-  } else {
-    router.push('/')
-  }
-
+  closeModals()
+  removeUser()
   router.push('/login')
 }
 
@@ -79,8 +75,7 @@ const handleAddTask = async (newTaskData) => {
       date: newTaskData.date ? new Date(newTaskData.date).toISOString() : new Date().toISOString(),
     }
 
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
+    const activeToken = user.value?.token
 
     const updatedTasks = await postTask({
       token: activeToken,
@@ -98,12 +93,7 @@ const handleAddTask = async (newTaskData) => {
   }
 }
 
-const getLoggedUser = () => {
-  const savedUser = localStorage.getItem('user')
-  return savedUser ? JSON.parse(savedUser) : { name: 'Гость', email: '' }
-}
-
-const currentUser = ref(getLoggedUser())
+const currentUser = user
 
 const isLoading = ref(true)
 const { initTheme } = useTheme()
@@ -113,8 +103,7 @@ const getTask = async () => {
     isLoading.value = true
     errorMessage.value = ''
 
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
+    const activeToken = user.value?.token
 
     const data = await fetchTask({
       token: activeToken,
@@ -133,7 +122,6 @@ const getTask = async () => {
 
 onMounted(() => {
   initTheme()
-
   getTask()
 })
 
@@ -160,8 +148,7 @@ const handleUpdateTask = async (updatedTask) => {
       date: updatedTask.date ? new Date(updatedTask.date).toISOString() : new Date().toISOString(),
     }
 
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
+    const activeToken = user.value?.token
 
     const updatedTasksFromServer = await editTask({
       token: activeToken,
@@ -192,8 +179,7 @@ const handleBasketTask = async (taskId) => {
     isLoading.value = true
     errorMessage.value = ''
 
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
+    const activeToken = user.value?.token
 
     const updatedTasksFromServer = await deleteTask({
       token: activeToken,

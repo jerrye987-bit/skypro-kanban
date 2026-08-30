@@ -69,9 +69,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { signIn, signUp } from '@/services/auth.js'
+
+const { setUser } = inject('auth')
 
 const router = useRouter()
 
@@ -151,7 +153,7 @@ async function handleSubmit(event) {
       : await signIn({ login: formData.value.login, password: formData.value.password })
 
     if (data) {
-      localStorage.setItem('user', JSON.stringify(data))
+      setUser(data)
 
       router.push('/')
     }
