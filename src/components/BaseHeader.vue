@@ -12,10 +12,15 @@
 
       <router-link to="/exit" custom v-slot="{ navigate }">
         <button class="btn-secondary" @click="navigate">
-          {{ user.name }}
+          {{ user?.name || 'Гость' }}
         </button>
       </router-link>
-      <ExitModal v-if="$route.path === '/exit'" :user="user" @close="closeModal" />
+
+      <ExitModal
+        v-if="$route.path === '/exit'"
+        :user="user || { name: 'Гость', login: '' }"
+        @close="closeModal"
+      />
     </nav>
   </header>
 </template>
@@ -26,8 +31,9 @@ import ExitModal from '@/components/ExitModal.vue'
 
 defineProps({
   user: {
-    type: Object,
-    required: true,
+    type: [Object, null],
+    required: false,
+    default: null,
   },
 })
 

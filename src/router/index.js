@@ -3,16 +3,21 @@ import TaskDesk from '@/components/TaskDesk.vue'
 // import SignInView from '@/views/SignIn.vue'
 // import SignUpView from '@/views/SignUp.vue'
 import NotFoundView from '@/views/NotFound.vue'
+import AppLayout from '@/layout/AppLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: TaskDesk,
+      component: AppLayout,
       meta: { requiresAuth: true },
       children: [
+        {
+          path: '',
+          name: 'home',
+          component: TaskDesk,
+        },
         {
           path: 'exit',
           name: 'exit',

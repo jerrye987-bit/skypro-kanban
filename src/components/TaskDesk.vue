@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTheme } from '@/composables/useTheme.js'
 
@@ -12,29 +12,21 @@ import TaskModal from '@/components/TaskModal.vue'
 import ExitModal from '@/components/ExitModal.vue'
 import ExitExitModal from '@/components/ExitExitModal.vue'
 
-import { fetchTask, postTask, editTask, deleteTask } from '@/services/api.js'
-
-const tasks = ref([])
-
 const route = useRoute()
 const router = useRouter()
+
+const { user, removeUser } = inject('auth')
+const { tasks, isLoading, errorMessage, refreshTasks, addNewTask, updateTaskData, removeTaskById } = inject('tasksStore')
 
 const isNewCardOpen = ref(false)
 const isBrowseOpen = ref(false)
 const selectedTask = ref(null)
 const isExitOpen = ref(false)
 const isConfirmExitOpen = ref(false)
-const errorMessage = ref('')
 
 const handleLogout = () => {
-  localStorage.removeItem('user')
-
-  if (typeof closeModals === 'function') {
-    closeModals()
-  } else {
-    router.push('/')
-  }
-
+  closeModals()
+  removeUser()
   router.push('/login')
 }
 
@@ -60,126 +52,53 @@ watch(
 const closeModals = () => {
   router.push('/')
 }
-
+// 1. Добавление задачи
 const handleAddTask = async (newTaskData) => {
   closeModals()
 
-  try {
-    isLoading.value = true
-    errorMessage.value = ''
-
-    const taskObj = {
-      title: newTaskData.title ? String(newTaskData.title).trim() : 'Новая задача',
-      topic: newTaskData.topic ? String(newTaskData.topic).trim() : 'Research',
-      status: 'Без статуса',
-      description:
-        newTaskData.description && String(newTaskData.description).trim() !== ''
-          ? String(newTaskData.description).trim()
-          : 'Описание отсутствует',
-      date: newTaskData.date ? new Date(newTaskData.date).toISOString() : new Date().toISOString(),
-    }
-
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
-
-    const updatedTasks = await postTask({
-      token: activeToken,
-      task: taskObj,
-    })
-
-    if (updatedTasks) {
-      tasks.value = updatedTasks
-    }
-  } catch (error) {
-    console.error('Ошибка при создании задачи:', error)
-    errorMessage.value = error.message || 'Не удалось создать задачу на сервере.'
-  } finally {
-    isLoading.value = false
+  const taskObj = {
+    title: newTaskData.title ? String(newTaskData.title).trim() : 'Новая задача',
+    topic: newTaskData.topic ? String(newTaskData.topic).trim() : 'Research',
+    status: 'Без статуса',
+    description: newTaskData.description && String(newTaskData.description).trim() !== ''
+      ? String(newTaskData.description).trim()
+      : 'Описание отсутствует',
+    date: newTaskData.date ? new Date(newTaskData.date).toISOString() : new Date().toISOString(),
   }
+
+  await addNewTask(taskObj)
 }
 
-const getLoggedUser = () => {
-  const savedUser = localStorage.getItem('user')
-  return savedUser ? JSON.parse(savedUser) : { name: 'Гость', email: '' }
-}
-
-const currentUser = ref(getLoggedUser())
-
-const isLoading = ref(true)
+const currentUser = user
 const { initTheme } = useTheme()
-
-const getTask = async () => {
-  try {
-    isLoading.value = true
-    errorMessage.value = ''
-
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
-
-    const data = await fetchTask({
-      token: activeToken,
-    })
-
-    if (data) {
-      tasks.value = data
-    }
-  } catch (err) {
-    errorMessage.value = err.message || 'Не удалось загрузить задачи с сервера.'
-    console.error('Ошибка в функции getTask:', err)
-  } finally {
-    isLoading.value = false
-  }
-}
 
 onMounted(() => {
   initTheme()
-
-  getTask()
+  // 2. Скачивание при загрузке доски
+  refreshTasks()
 })
 
+// 3. Открытие карточки по ID
 const openTaskModal = (id) => {
-  selectedTask.value = tasks.value.find((t) => t._id === id)
-
-  if (selectedTask.value) {
-    router.push(`/card/${id}`)
-  }
+  router.push(`/card/${id}`)
 }
 
+// 4. Редактирование задачи
 const handleUpdateTask = async (updatedTask) => {
   closeModals()
 
-  try {
-    isLoading.value = true
-    errorMessage.value = ''
-
-    const taskObj = {
-      title: updatedTask.title,
-      topic: updatedTask.topic,
-      status: updatedTask.status,
-      description: updatedTask.description,
-      date: updatedTask.date ? new Date(updatedTask.date).toISOString() : new Date().toISOString(),
-    }
-
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
-
-    const updatedTasksFromServer = await editTask({
-      token: activeToken,
-      id: updatedTask._id,
-      task: taskObj,
-    })
-
-    if (updatedTasksFromServer) {
-      tasks.value = updatedTasksFromServer
-    }
-  } catch (error) {
-    console.error('Ошибка при обновлении задачи на бэкенде:', error)
-    errorMessage.value = error.message || 'Не удалось сохранить изменения задачи.'
-  } finally {
-    isLoading.value = false
+  const taskObj = {
+    title: updatedTask.title,
+    topic: updatedTask.topic,
+    status: updatedTask.status,
+    description: updatedTask.description,
+    date: updatedTask.date ? new Date(updatedTask.date).toISOString() : new Date().toISOString(),
   }
+
+  await updateTaskData(updatedTask._id, taskObj)
 }
 
+// 5. Удаление задачи
 const handleBasketTask = async (taskId) => {
   closeModals()
 
@@ -188,33 +107,33 @@ const handleBasketTask = async (taskId) => {
     return
   }
 
-  try {
-    isLoading.value = true
-    errorMessage.value = ''
-
-    const userData = JSON.parse(localStorage.getItem('user'))
-    const activeToken = userData?.token
-
-    const updatedTasksFromServer = await deleteTask({
-      token: activeToken,
-      id: taskId,
-    })
-
-    if (updatedTasksFromServer) {
-      tasks.value = updatedTasksFromServer
-    }
-  } catch (error) {
-    console.error('Ошибка при удалении задачи на бэкенде:', error)
-    errorMessage.value = error.message || 'Не удалось удалить задачу на сервере.'
-  } finally {
-    isLoading.value = false
-  }
+  await removeTaskById(taskId)
 }
 </script>
 
 <template>
   <div class="task-desk">
     <BaseHeader :user="currentUser" />
+
+    <!-- Баннер ошибки бэкенда. Отображается только если в errorMessage есть текст -->
+    <div
+      v-if="errorMessage"
+      class="task-desk__error-banner"
+      style="
+        background-color: rgba(248, 66, 66, 0.1);
+        border: 1px solid #f84242;
+        color: #f84242;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 20px auto 0 auto;
+        max-width: 1200px;
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+      "
+    >
+      {{ errorMessage }}
+    </div>
 
     <!-- Сетка колонок проекта -->
     <main class="task-desk__grid">

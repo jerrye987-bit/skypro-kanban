@@ -71,7 +71,7 @@
                 <div class="calendar__nav">
                   <div class="calendar__month">{{ currentMonthName }}</div>
                   <div class="nav__actions">
-                    <div class="nav__action" @click="prevMonth" style="cursor: pointer;">
+                    <div class="nav__action" @click="prevMonth" style="cursor: pointer">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -83,7 +83,7 @@
                         />
                       </svg>
                     </div>
-                    <div class="nav__action" @click="nextMonth" style="cursor: pointer;">
+                    <div class="nav__action" @click="nextMonth" style="cursor: pointer">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -118,12 +118,21 @@
                         { '_cell-day': cell.isCurrentMonth },
                         { '_other-month': !cell.isCurrentMonth },
                         { '_active-day': isSelectedDay(cell) },
-                        { '_current': isToday(cell) },
-                        { '_weekend': isWeekend(cell) },
-                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) }
+                        { _current: isToday(cell) },
+                        { _weekend: isWeekend(cell) },
+                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) },
                       ]"
-                      :style="{ cursor: (isEditing && cell.isCurrentMonth && !isDayInPast(cell)) ? 'pointer' : 'default' }"
-                       @click="isEditing && cell.isCurrentMonth && !isDayInPast(cell) ? selectDate(cell) : null"
+                      :style="{
+                        cursor:
+                          isEditing && cell.isCurrentMonth && !isDayInPast(cell)
+                            ? 'pointer'
+                            : 'default',
+                      }"
+                      @click="
+                        isEditing && cell.isCurrentMonth && !isDayInPast(cell)
+                          ? selectDate(cell)
+                          : null
+                      "
                     >
                       {{ cell.day }}
                     </div>
@@ -134,7 +143,10 @@
                 <div class="calendar__period">
                   <p class="calendar__p date-end">
                     Срок исполнения:
-                    <span class="date-control" style="color: black; font-weight: 500; margin-left: 4px;">
+                    <span
+                      class="date-control"
+                      style="color: black; font-weight: 500; margin-left: 4px"
+                    >
                       {{ taskDate.toLocaleDateString() }}
                     </span>
                   </p>
@@ -187,9 +199,7 @@
                 Удалить задачу
               </button>
             </div>
-            <button
-              class="btn-edit__close _btn-bg _hover01"
-              @click="cancelEditing">
+            <button class="btn-edit__close _btn-bg _hover01" @click="cancelEditing">
               <a href="#">Закрыть</a>
             </button>
           </div>
@@ -225,8 +235,18 @@ const currentYear = ref(isDateInPast ? today.getFullYear() : taskDate.value.getF
 const currentMonth = ref(isDateInPast ? today.getMonth() : taskDate.value.getMonth())
 
 const monthNames = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
 ]
 
 const currentMonthName = computed(() => {
@@ -247,7 +267,7 @@ const calendarCells = computed(() => {
     cells.push({
       day: daysInPrevMonth - i,
       isCurrentMonth: false,
-      date: null
+      date: null,
     })
   }
 
@@ -255,7 +275,7 @@ const calendarCells = computed(() => {
     cells.push({
       day,
       isCurrentMonth: true,
-      date: new Date(currentYear.value, currentMonth.value, day)
+      date: new Date(currentYear.value, currentMonth.value, day),
     })
   }
 
@@ -352,7 +372,7 @@ const saveChanges = () => {
     title: editedTitle.value,
     description: editedDescription.value,
     status: editedStatus.value,
-    date: safeDate.toISOString()
+    date: safeDate.toISOString(),
   })
   isEditing.value = false
 }
