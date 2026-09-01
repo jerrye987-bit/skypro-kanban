@@ -36,11 +36,10 @@
             <div class="pop-new-card__calendar calendar">
               <p class="calendar__ttl subttl">Даты</p>
               <div class="calendar__block">
-
                 <div class="calendar__nav">
                   <div class="calendar__month">{{ currentMonthName }}</div>
                   <div class="nav__actions">
-                    <div class="nav__action" @click="prevMonth" style="cursor: pointer;">
+                    <div class="nav__action" @click="prevMonth" style="cursor: pointer">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -52,7 +51,7 @@
                         />
                       </svg>
                     </div>
-                    <div class="nav__action" @click="nextMonth" style="cursor: pointer;">
+                    <div class="nav__action" @click="nextMonth" style="cursor: pointer">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -86,11 +85,13 @@
                         { '_cell-day': cell.isCurrentMonth },
                         { '_other-month': !cell.isCurrentMonth },
                         { '_active-day': isSelectedDay(cell) },
-                        { '_current': isTodayCell(cell) },
-                        { '_weekend': isWeekend(cell) },
-                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) }
+                        { _current: isTodayCell(cell) },
+                        { _weekend: isWeekend(cell) },
+                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) },
                       ]"
-                      :style="{ cursor: (cell.isCurrentMonth && !isDayInPast(cell)) ? 'pointer' : 'default' }"
+                      :style="{
+                        cursor: cell.isCurrentMonth && !isDayInPast(cell) ? 'pointer' : 'default',
+                      }"
                       @click="selectDate(cell)"
                     >
                       {{ cell.day }}
@@ -101,7 +102,10 @@
                 <div class="calendar__period">
                   <p class="calendar__p date-end">
                     Срок исполнения:
-                    <span class="date-control" style="color: black; font-weight: 500; margin-left: 4px;">
+                    <span
+                      class="date-control"
+                      style="color: black; font-weight: 500; margin-left: 4px"
+                    >
                       {{ formatDateShort(taskDate) }}
                     </span>
                   </p>
@@ -173,8 +177,18 @@ const currentYear = ref(today.getFullYear())
 const currentMonth = ref(today.getMonth())
 
 const monthNames = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
 ]
 
 const currentMonthName = computed(() => {
@@ -199,7 +213,7 @@ const calendarCells = computed(() => {
     cells.push({
       day,
       isCurrentMonth: true,
-      date: new Date(currentYear.value, currentMonth.value, day)
+      date: new Date(currentYear.value, currentMonth.value, day),
     })
   }
   return cells
@@ -260,7 +274,7 @@ const formatDateShort = (date) => {
   return date.toLocaleDateString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
-    year: '2-digit'
+    year: '2-digit',
   })
 }
 
@@ -277,7 +291,7 @@ const submitForm = () => {
     topic: topic.value.trim(),
     description: description.value.trim(),
     // Отправляем готовую ISO-строку с датой родителю!
-    date: safeDate.toISOString()
+    date: safeDate.toISOString(),
   })
 
   // Сбрасываем форму

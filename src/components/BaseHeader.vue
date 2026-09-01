@@ -16,7 +16,11 @@
         </button>
       </router-link>
 
-      <ExitModal v-if="$route.path === '/exit'" :user="user || { name: 'Гость', login: '' }" @close="closeModal" />
+      <ExitModal
+        v-if="$route.path === '/exit'"
+        :user="user || { name: 'Гость', login: '' }"
+        @close="closeModal"
+      />
     </nav>
   </header>
 </template>
@@ -29,7 +33,7 @@ defineProps({
   user: {
     type: [Object, null],
     required: false,
-    default: null
+    default: null,
   },
 })
 
