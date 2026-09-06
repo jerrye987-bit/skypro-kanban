@@ -16,7 +16,8 @@ const route = useRoute()
 const router = useRouter()
 
 const { user, removeUser } = inject('auth')
-const { tasks, isLoading, errorMessage, refreshTasks, addNewTask, updateTaskData, removeTaskById } = inject('tasksStore')
+const { tasks, isLoading, errorMessage, refreshTasks, addNewTask, updateTaskData, removeTaskById } =
+  inject('tasksStore')
 
 const isNewCardOpen = ref(false)
 const isBrowseOpen = ref(false)
@@ -60,9 +61,10 @@ const handleAddTask = async (newTaskData) => {
     title: newTaskData.title ? String(newTaskData.title).trim() : 'Новая задача',
     topic: newTaskData.topic ? String(newTaskData.topic).trim() : 'Research',
     status: 'Без статуса',
-    description: newTaskData.description && String(newTaskData.description).trim() !== ''
-      ? String(newTaskData.description).trim()
-      : 'Описание отсутствует',
+    description:
+      newTaskData.description && String(newTaskData.description).trim() !== ''
+        ? String(newTaskData.description).trim()
+        : 'Описание отсутствует',
     date: newTaskData.date ? new Date(newTaskData.date).toISOString() : new Date().toISOString(),
   }
 
@@ -160,7 +162,7 @@ const handleBasketTask = async (taskId) => {
               <!-- Передаем объект задачи целиком в проп :task и слушаем событие @open-task -->
               <Task
                 v-for="task in tasks.filter((t) => t.status === 'Без статуса')"
-                :key="task.id"
+                :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
               />
@@ -178,7 +180,7 @@ const handleBasketTask = async (taskId) => {
             <template v-else>
               <Task
                 v-for="task in tasks.filter((t) => t.status === 'Нужно сделать')"
-                :key="task.id"
+                :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
               />
@@ -196,7 +198,7 @@ const handleBasketTask = async (taskId) => {
             <template v-else>
               <Task
                 v-for="task in tasks.filter((t) => t.status === 'В работе')"
-                :key="task.id"
+                :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
               />
@@ -214,7 +216,7 @@ const handleBasketTask = async (taskId) => {
             <template v-else>
               <Task
                 v-for="task in tasks.filter((t) => t.status === 'Тестирование')"
-                :key="task.id"
+                :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
               />
@@ -232,7 +234,7 @@ const handleBasketTask = async (taskId) => {
             <template v-else>
               <Task
                 v-for="task in tasks.filter((t) => t.status === 'Готово')"
-                :key="task.id"
+                :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
               />

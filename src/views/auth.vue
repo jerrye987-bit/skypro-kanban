@@ -27,6 +27,7 @@
               placeholder="Эл. почта"
               v-model="formData.login"
               autocomplete="username"
+              @focus="clearError('login')"
             />
 
             <input
@@ -52,12 +53,16 @@
             <div class="modal__form-group">
               <div v-if="!isSignUp">
                 <p>Нужно зарегистрироваться?</p>
-                <RouterLink to="/register">Регистрируйтесь здесь</RouterLink>
+                <RouterLink to="/register" @click="clearAllErrors"
+                  >Регистрируйтесь здесь</RouterLink
+                >
               </div>
               <div v-else>
                 <p>
                   Уже есть аккаунт?
-                  <RouterLink to="/login" class="link-inline">Войдите здесь</RouterLink>
+                  <RouterLink to="/login" class="link-inline" @click="clearAllErrors"
+                    >Войдите здесь</RouterLink
+                  >
                 </p>
               </div>
             </div>
@@ -94,6 +99,13 @@ const errors = ref({
 })
 
 const error = ref('')
+
+function clearAllErrors() {
+  error.value = ''
+  errors.value.name = false
+  errors.value.login = false
+  errors.value.password = false
+}
 
 function clearError(field) {
   errors.value[field] = false

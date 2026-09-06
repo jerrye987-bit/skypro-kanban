@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TaskDesk from '@/components/TaskDesk.vue'
-// import SignInView from '@/views/SignIn.vue'
-// import SignUpView from '@/views/SignUp.vue'
 import NotFoundView from '@/views/NotFound.vue'
 import AppLayout from '@/layout/AppLayout.vue'
+import AuthLayout from '@/layout/AuthLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // 1. Группа страниц задач. Требует авторизации. Использует AppLayout/
     {
       path: '/',
       component: AppLayout,
@@ -35,22 +35,27 @@ const router = createRouter({
         },
       ],
     },
+    // 2. Группа страниц авторизации. Использует AuthLayout
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/auth.vue'),
-      props: { isSignUp: false },
+      path: '/',
+      component: AuthLayout,
       meta: { requiresGuest: true },
+      children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: () => import('@/views/auth.vue'),
+          props: { isSignUp: false },
+        },
+        {
+          path: 'register',
+          name: 'register',
+          component: () => import('@/views/auth.vue'),
+          props: { isSignUp: true },
+        },
+      ],
     },
-
-    {
-      path: '/register',
-      name: 'register',
-      component: () => import('@/views/auth.vue'),
-      props: { isSignUp: true },
-      meta: { requiresGuest: true },
-    },
-
+    // 3. Служебные страницы.
     {
       path: '/404',
       name: 'not-found',

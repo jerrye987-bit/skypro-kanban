@@ -15,20 +15,11 @@
           {{ user?.name || 'Гость' }}
         </button>
       </router-link>
-
-      <ExitModal
-        v-if="$route.path === '/exit'"
-        :user="user || { name: 'Гость', login: '' }"
-        @close="closeModal"
-      />
     </nav>
   </header>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import ExitModal from '@/components/ExitModal.vue'
-
 defineProps({
   user: {
     type: [Object, null],
@@ -36,14 +27,6 @@ defineProps({
     default: null,
   },
 })
-
-const router = useRouter()
-
-const closeModal = () => {
-  router.push('/')
-}
-
-defineEmits(['open-profile'])
 </script>
 
 <style lang="scss" scoped>
