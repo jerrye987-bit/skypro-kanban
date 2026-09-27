@@ -2,6 +2,16 @@ import axios from 'axios'
 
 const API_URL = 'https://wedev-api.sky.pro/api/kanban'
 
+function getErrorMessage(error) {
+  if (error.response) {
+    return error.response.data?.error || 'Ошибка сервера. Попробуйте позже.'
+  }
+  if (error.request) {
+    return 'Сервер недоступен. Проверьте подключение к интернету и попробуйте снова.'
+  }
+  return error.message || 'Произошла неизвестная ошибка.'
+}
+
 // Получение задач с сервера
 export async function fetchTask({ token }) {
   try {
@@ -13,8 +23,7 @@ export async function fetchTask({ token }) {
 
     return data.data.tasks
   } catch (error) {
-    const errorMessage = error.response?.data?.error || error.message
-    throw new Error(errorMessage, { cause: error })
+    throw new Error(getErrorMessage(error), { cause: error })
   }
 }
 
@@ -29,8 +38,7 @@ export async function fetchTaskById({ id, token }) {
 
     return data.data.task || data.data.tasks[0]
   } catch (error) {
-    const errorMessage = error.response?.data?.error || error.message
-    throw new Error(errorMessage, { cause: error })
+    throw new Error(getErrorMessage(error), { cause: error })
   }
 }
 
@@ -46,8 +54,7 @@ export async function postTask({ token, task }) {
 
     return data.data.tasks
   } catch (error) {
-    const errorMessage = error.response?.data?.error || error.message
-    throw new Error(errorMessage, { cause: error })
+    throw new Error(getErrorMessage(error), { cause: error })
   }
 }
 
@@ -63,8 +70,7 @@ export async function editTask({ token, id, task }) {
 
     return data.data.tasks
   } catch (error) {
-    const errorMessage = error.response?.data?.error || error.message
-    throw new Error(errorMessage, { cause: error })
+    throw new Error(getErrorMessage(error), { cause: error })
   }
 }
 
@@ -74,13 +80,11 @@ export async function deleteTask({ token, id }) {
     const data = await axios.delete(`${API_URL}/${id}`, {
       headers: {
         Authorization: 'Bearer ' + token,
-        'Content-Type': '',
       },
     })
 
     return data.data.tasks
   } catch (error) {
-    const errorMessage = error.response?.data?.error || error.message
-    throw new Error(errorMessage, { cause: error })
+    throw new Error(getErrorMessage(error), { cause: error })
   }
 }

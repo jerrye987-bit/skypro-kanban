@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useTheme } from '@/composables/useTheme.js'
 
 import BaseHeader from '@/components/BaseHeader.vue'
 import TaskColumn from '@/components/TaskColumn.vue'
@@ -72,11 +71,8 @@ const handleAddTask = async (newTaskData) => {
 }
 
 const currentUser = user
-const { initTheme } = useTheme()
 
 onMounted(() => {
-  initTheme()
-  // 2. Скачивание при загрузке доски
   refreshTasks()
 })
 

@@ -11,12 +11,11 @@ import { fetchTask, postTask, editTask, deleteTask } from '@/services/api.js'
 
 const { user } = inject('auth')
 
-// Блок работы с задачами
 const tasks = ref([])
 const isLoading = ref(false)
+const isSaving = ref(false)
 const errorMessage = ref('')
 
-// 1. Сетевое скачивание задач
 const refreshTasks = async () => {
   if (!user.value?.token) return
   try {
@@ -26,62 +25,57 @@ const refreshTasks = async () => {
     if (data) tasks.value = data
   } catch (err) {
     errorMessage.value = err.message || 'Не удалось загрузить задачи с сервера.'
-    console.error(err)
   } finally {
     isLoading.value = false
   }
 }
 
-// 2. Сетевое добавление задачи
 const addNewTask = async (taskObj) => {
   if (!user.value?.token) return
   try {
-    isLoading.value = true
+    isSaving.value = true
+    errorMessage.value = ''
     const updated = await postTask({ token: user.value.token, task: taskObj })
     if (updated) tasks.value = updated
   } catch (err) {
-    console.error('Ошибка создания задачи через provide:', err)
-    throw err
+    errorMessage.value = err.message || 'Не удалось создать задачу.'
   } finally {
-    isLoading.value = false
+    isSaving.value = false
   }
 }
 
-// 3. Сетевое редактирование задачи
 const updateTaskData = async (id, taskObj) => {
   if (!user.value?.token) return
   try {
-    isLoading.value = true
+    isSaving.value = true
+    errorMessage.value = ''
     const updated = await editTask({ token: user.value.token, id, task: taskObj })
     if (updated) tasks.value = updated
   } catch (err) {
-    console.error('Ошибка обновления задачи через provide:', err)
-    throw err
+    errorMessage.value = err.message || 'Не удалось обновить задачу.'
   } finally {
-    isLoading.value = false
+    isSaving.value = false
   }
 }
 
-// 4. Сетевое удаление задачи
 const removeTaskById = async (id) => {
   if (!user.value?.token) return
   try {
-    isLoading.value = true
+    isSaving.value = true
+    errorMessage.value = ''
     const updated = await deleteTask({ token: user.value.token, id })
     if (updated) tasks.value = updated
   } catch (err) {
-    console.error('Ошибка удаления задачи через provide:', err)
-    throw err
+    errorMessage.value = err.message || 'Не удалось удалить задачу.'
   } finally {
-    isLoading.value = false
+    isSaving.value = false
   }
 }
-
-// Передаем хранилище задач в дочерние компоненты
 
 provide('tasksStore', {
   tasks,
   isLoading,
+  isSaving,
   errorMessage,
   refreshTasks,
   addNewTask,

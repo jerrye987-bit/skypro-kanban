@@ -13,25 +13,28 @@
               <div class="form-new__block">
                 <label for="formTitle" class="subttl">Название задачи</label>
                 <input
-                  v-model="title"
-                  class="form-new__input"
+                  v-model.trim="title"
+                  :class="['form-new__input', { 'form-new__input--error': errors.title }]"
                   type="text"
                   name="name"
                   id="formTitle"
                   placeholder="Введите название задачи..."
-                  required
+                  @focus="clearError('title')"
                 />
               </div>
               <div class="form-new__block">
                 <label for="textArea" class="subttl">Описание задачи</label>
                 <textarea
-                  v-model="description"
-                  class="form-new__area"
+                  v-model.trim="description"
+                  :class="['form-new__area', { 'form-new__area--error': errors.description }]"
                   name="text"
                   id="textArea"
                   placeholder="Введите описание задачи..."
+                  @focus="clearError('description')"
                 ></textarea>
               </div>
+
+              <p v-if="errorMessage" class="form-new__error">{{ errorMessage }}</p>
             </form>
             <div class="pop-new-card__calendar calendar">
               <p class="calendar__ttl subttl">Даты</p>
@@ -127,7 +130,6 @@
               >
                 <p class="_orange">Web Design</p>
               </div>
-
               <div
                 :class="[
                   'categories__theme',
@@ -138,7 +140,6 @@
               >
                 <p class="_green">Research</p>
               </div>
-
               <div
                 :class="[
                   'categories__theme',
@@ -169,8 +170,20 @@ const emit = defineEmits(['close', 'add-task'])
 const title = ref('')
 const description = ref('')
 const topic = ref('Web Design')
-
 const taskDate = ref(new Date())
+
+const errors = ref({
+  title: false,
+  description: false,
+})
+const errorMessage = ref('')
+
+function clearError(field) {
+  errors.value[field] = false
+  if (!errors.value.title && !errors.value.description) {
+    errorMessage.value = ''
+  }
+}
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
@@ -191,11 +204,8 @@ const monthNames = [
   'Декабрь',
 ]
 
-const currentMonthName = computed(() => {
-  return `${monthNames[currentMonth.value]} ${currentYear.value}`
-})
+const currentMonthName = computed(() => `${monthNames[currentMonth.value]} ${currentYear.value}`)
 
-// Вычисляем массив ячеек для сетки календаря
 const calendarCells = computed(() => {
   const cells = []
   const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1)
@@ -238,12 +248,10 @@ const nextMonth = () => {
 }
 
 const selectDate = (cell) => {
-  // Блокируем клики по дням из прошлого и чужих месяцев
   if (!cell.isCurrentMonth || isDayInPast(cell)) return
   taskDate.value = cell.date
 }
 
-// Проверки для стилей ячеек
 const isSelectedDay = (cell) => {
   if (!cell.isCurrentMonth || !cell.date) return false
   return cell.date.toDateString() === taskDate.value.toDateString()
@@ -269,7 +277,6 @@ const isDayInPast = (cell) => {
   return cellDateStart.getTime() < todayStart.getTime()
 }
 
-// 🚀 ФУНКЦИЯ ФОРМАТИРОВАНИЯ ДЛЯ ВЫВОДА СРОКА НА ЭКРАН (30.08.26)
 const formatDateShort = (date) => {
   return date.toLocaleDateString('ru-RU', {
     day: '2-digit',
@@ -278,23 +285,39 @@ const formatDateShort = (date) => {
   })
 }
 
-// 🚀 МЕТОД ОТПРАВКИ ФОРМЫ
-const submitForm = () => {
-  if (!title.value.trim()) return
+function validateForm() {
+  errors.value.title = false
+  errors.value.description = false
+  errorMessage.value = ''
 
-  // Перед отправкой принудительно фиксируем время на 12:00 дня для защиты от сдвига поясов
+  if (!title.value) {
+    errors.value.title = true
+    errorMessage.value = 'Введите название задачи'
+    return false
+  }
+
+  if (!description.value) {
+    errors.value.description = true
+    errorMessage.value = 'Введите описание задачи'
+    return false
+  }
+
+  return true
+}
+
+const submitForm = () => {
+  if (!validateForm()) return
+
   const safeDate = new Date(taskDate.value)
   safeDate.setHours(12, 0, 0, 0)
 
   emit('add-task', {
-    title: title.value.trim(),
-    topic: topic.value.trim(),
-    description: description.value.trim(),
-    // Отправляем готовую ISO-строку с датой родителю!
+    title: title.value,
+    topic: topic.value,
+    description: description.value,
     date: safeDate.toISOString(),
   })
 
-  // Сбрасываем форму
   title.value = ''
   description.value = ''
   topic.value = 'Web Design'
@@ -303,6 +326,19 @@ const submitForm = () => {
 </script>
 
 <style lang="scss" scoped>
+.form-new__input--error,
+.form-new__area--error {
+  border-color: #f84242 !important;
+  background-color: rgba(248, 66, 66, 0.03);
+}
+
+.form-new__error {
+  color: #f84242;
+  font-size: 12px;
+  margin-top: 10px;
+  text-align: center;
+}
+
 .pop-new-card {
   display: flex;
   width: 100%;
