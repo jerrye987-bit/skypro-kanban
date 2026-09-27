@@ -61,12 +61,15 @@ defineEmits(['close', 'confirm'])
   box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.15) !important;
   margin: 0 auto !important;
 }
+.pop-exit__ttl h2 {
+  color: #000000;
+}
 .pop-exit__exit-no {
   width: 153px;
   height: 30px;
   background-color: transparent;
   border-radius: 4px;
-  border: 0.7px solid var(--palette-navy-60, #565eef) !important;
+  border: 0.7px solid #565eef !important;
   outline: none;
   display: flex;
   align-items: center;
@@ -84,5 +87,23 @@ defineEmits(['close', 'confirm'])
   display: flex;
   align-items: center;
   justify-content: center;
+}
+</style>
+
+<style lang="scss">
+[data-theme='dark'] .pop-exit__block {
+  background-color: #20202C !important;
+  border: 1px solid #4E5566 !important;
+  box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.4) !important;
+}
+[data-theme='dark'] .pop-exit__ttl h2 {
+  color: #FFFFFF !important;
+}
+[data-theme='dark'] .pop-exit__exit-no {
+  border: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+[data-theme='dark'] .pop-exit__exit-no a {
+  color: #FFFFFF !important;
 }
 </style>

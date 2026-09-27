@@ -1,31 +1,36 @@
-import { ref } from 'vue'
+import { useDark, useToggle } from '@vueuse/core'
+import { watchEffect } from 'vue'
 
-const isDark = ref(false)
+const isDark = useDark({
+  selector: 'html',
+  attribute: 'data-theme',
+  valueDark: 'dark',
+  valueLight: '',
+  storageKey: 'theme',
+})
+
+const toggleTheme = useToggle(isDark)
+
+watchEffect(() => {
+  const existing = document.getElementById('dark-theme-styles')
+  if (isDark.value) {
+    if (!existing) {
+      const link = document.createElement('link')
+      link.id = 'dark-theme-styles'
+      link.rel = 'stylesheet'
+      link.href = '/assets/main_dark.css'
+      document.head.appendChild(link)
+    }
+  } else {
+    if (existing) {
+      existing.remove()
+    }
+  }
+})
 
 export function useTheme() {
-  const toggleTheme = () => {
-    isDark.value = !isDark.value
-
-    if (isDark.value) {
-      document.documentElement.setAttribute('data-theme', 'dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.removeAttribute('data-theme')
-      localStorage.setItem('theme', 'light')
-    }
-  }
-
-  const initTheme = () => {
-    const savedTheme = localStorage.getItem('theme')
-    if (savedTheme === 'dark') {
-      isDark.value = true
-      document.documentElement.setAttribute('data-theme', 'dark')
-    }
-  }
-
   return {
     isDark,
     toggleTheme,
-    initTheme,
   }
 }

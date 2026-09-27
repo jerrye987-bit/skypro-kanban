@@ -11,7 +11,7 @@
           <p>Темная тема</p>
           <input
             :checked="isDark"
-            @change="toggleTheme"
+            @change="toggleTheme()"
             type="checkbox"
             class="checkbox"
             name="checkbox"
@@ -44,6 +44,37 @@ const { isDark, toggleTheme } = useTheme()
 </script>
 
 <style lang="scss" scoped>
+.pop-exit {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+.pop-exit__container {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent;
+}
+
+.pop-exit__block {
+  position: absolute;
+  top: 61px;
+  right: 130px;
+  margin: 0;
+  background-color: #ffffff;
+  max-width: 213px;
+  width: 100%;
+  padding: 34px;
+  border-radius: 10px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0px 10px 39px 0px rgba(26, 56, 101, 0.21);
+  text-align: center;
+}
+
 .pop-user-set__name {
   color: #000;
   font-size: 14px;
@@ -100,6 +131,7 @@ const { isDark, toggleTheme } = useTheme()
 }
 .pop-user-set__theme input:checked[type='checkbox']::before {
   left: 12px;
+  background-color: #565eef;
 }
 .pop-user-set__btn {
   width: 100%;
@@ -108,11 +140,11 @@ const { isDark, toggleTheme } = useTheme()
   background: transparent;
   color: #565eef;
   border-radius: 4px;
-  border: 1px solid #565eef !important;
+  border: 1px solid #565eef;
 }
 .pop-user-set__btn:hover {
-  background: #565eef !important;
-  color: #ffffff !important;
+  background: #565eef;
+  color: #ffffff;
 }
 .pop-user-set button a {
   color: #565eef;
@@ -127,5 +159,11 @@ const { isDark, toggleTheme } = useTheme()
   font-size: 20px;
   cursor: pointer;
   color: #94a6be;
+}
+
+@media screen and (max-width: 768px) {
+  .pop-exit__block {
+    right: 16px;
+  }
 }
 </style>

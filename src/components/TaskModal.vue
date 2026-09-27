@@ -3,13 +3,16 @@
     <div class="pop-browse__container">
       <div class="pop-browse__block" @click.stop>
         <div class="pop-browse__content">
-          <!-- Заголовок и Категория карточки -->
           <div class="pop-browse__top-block">
             <input
               v-if="isEditing"
-              v-model="editedTitle"
+              v-model.trim="editedTitle"
+              :class="[
+                'form-browse__input-title',
+                { 'form-browse__input-title--error': errors.title },
+              ]"
               type="text"
-              class="form-browse__input-title"
+              @focus="clearError('title')"
             />
 
             <h3 v-else class="pop-browse__ttl">{{ task?.title }}</h3>
@@ -26,7 +29,6 @@
             </div>
           </div>
 
-          <!-- Блок Статуса (Колонки доски) -->
           <div class="pop-browse__status status">
             <p class="status__p subttl">Статус</p>
             <div class="status__themes">
@@ -48,13 +50,12 @@
             </div>
           </div>
 
-          <!-- Описание задачи -->
           <div class="pop-browse__wrap">
             <form class="pop-browse__form form-browse" id="formBrowseCard" @submit.prevent>
               <div class="form-browse__block">
                 <label for="textArea01" class="subttl">Описание задачи</label>
                 <textarea
-                  v-model="editedDescription"
+                  v-model.trim="editedDescription"
                   class="form-browse__area"
                   name="text"
                   id="textArea01"
@@ -62,16 +63,17 @@
                   placeholder="Введите описание задачи..."
                 ></textarea>
               </div>
+
+              <p v-if="errorMessage" class="form-browse__error">{{ errorMessage }}</p>
             </form>
 
-            <!-- Блок статического календаря -->
             <div class="pop-new-card__calendar calendar">
               <p class="calendar__ttl subttl">Даты</p>
               <div class="calendar__block">
                 <div class="calendar__nav">
                   <div class="calendar__month">{{ currentMonthName }}</div>
                   <div class="nav__actions">
-                    <div class="nav__action" @click="prevMonth" style="cursor: pointer;">
+                    <div class="nav__action" @click="prevMonth" style="cursor: pointer">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -83,7 +85,7 @@
                         />
                       </svg>
                     </div>
-                    <div class="nav__action" @click="nextMonth" style="cursor: pointer;">
+                    <div class="nav__action" @click="nextMonth" style="cursor: pointer">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="6"
@@ -118,23 +120,34 @@
                         { '_cell-day': cell.isCurrentMonth },
                         { '_other-month': !cell.isCurrentMonth },
                         { '_active-day': isSelectedDay(cell) },
-                        { '_current': isToday(cell) },
-                        { '_weekend': isWeekend(cell) },
-                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) }
+                        { _current: isToday(cell) },
+                        { _weekend: isWeekend(cell) },
+                        { '_disabled-day': cell.isCurrentMonth && isDayInPast(cell) },
                       ]"
-                      :style="{ cursor: (isEditing && cell.isCurrentMonth && !isDayInPast(cell)) ? 'pointer' : 'default' }"
-                       @click="isEditing && cell.isCurrentMonth && !isDayInPast(cell) ? selectDate(cell) : null"
+                      :style="{
+                        cursor:
+                          isEditing && cell.isCurrentMonth && !isDayInPast(cell)
+                            ? 'pointer'
+                            : 'default',
+                      }"
+                      @click="
+                        isEditing && cell.isCurrentMonth && !isDayInPast(cell)
+                          ? selectDate(cell)
+                          : null
+                      "
                     >
                       {{ cell.day }}
                     </div>
                   </div>
                 </div>
 
-                <input type="hidden" id="datepick_value" value="08.09.2023" />
                 <div class="calendar__period">
                   <p class="calendar__p date-end">
                     Срок исполнения:
-                    <span class="date-control" style="color: black; font-weight: 500; margin-left: 4px;">
+                    <span
+                      class="date-control"
+                      style="color: black; font-weight: 500; margin-left: 4px"
+                    >
                       {{ taskDate.toLocaleDateString() }}
                     </span>
                   </p>
@@ -143,7 +156,6 @@
             </div>
           </div>
 
-          <!-- Нижняя категория -->
           <div class="theme-down__categories theme-down">
             <p class="categories__p subttl">Категория</p>
             <div
@@ -153,7 +165,6 @@
             </div>
           </div>
 
-          <!-- БЛОК КНОПОК РЕЖИМА ПРОСМОТРА -->
           <div v-if="!isEditing" class="pop-browse__btn-browse">
             <div class="btn-group">
               <button class="btn-browse__edit _btn-bor _hover03" @click="isEditing = true">
@@ -171,7 +182,6 @@
             </button>
           </div>
 
-          <!-- 🔘 БЛОК КНОПОК РЕЖИМА РЕДАКТИРОВАНИЯ -->
           <div v-else class="pop-browse__btn-edit">
             <div class="btn-group">
               <button class="btn-edit__edit _btn-bg _hover01" @click="saveChanges">
@@ -187,9 +197,7 @@
                 Удалить задачу
               </button>
             </div>
-            <button
-              class="btn-edit__close _btn-bg _hover01"
-              @click="cancelEditing">
+            <button class="btn-edit__close _btn-bg _hover01" @click="cancelEditing">
               <a href="#">Закрыть</a>
             </button>
           </div>
@@ -217,6 +225,9 @@ const editedTitle = ref('')
 const editedDescription = ref('')
 const editedStatus = ref('')
 
+const errors = ref({ title: false })
+const errorMessage = ref('')
+
 const taskDate = ref(props.task.date ? new Date(props.task.date) : new Date())
 const today = new Date()
 const isDateInPast = taskDate.value.getTime() < today.getTime()
@@ -225,17 +236,24 @@ const currentYear = ref(isDateInPast ? today.getFullYear() : taskDate.value.getF
 const currentMonth = ref(isDateInPast ? today.getMonth() : taskDate.value.getMonth())
 
 const monthNames = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
 ]
 
-const currentMonthName = computed(() => {
-  return `${monthNames[currentMonth.value]} ${currentYear.value}`
-})
+const currentMonthName = computed(() => `${monthNames[currentMonth.value]} ${currentYear.value}`)
 
 const calendarCells = computed(() => {
   const cells = []
-
   const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1)
   const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
 
@@ -244,18 +262,14 @@ const calendarCells = computed(() => {
 
   const daysInPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
   for (let i = startDayOfWeek - 1; i >= 0; i--) {
-    cells.push({
-      day: daysInPrevMonth - i,
-      isCurrentMonth: false,
-      date: null
-    })
+    cells.push({ day: daysInPrevMonth - i, isCurrentMonth: false, date: null })
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
     cells.push({
       day,
       isCurrentMonth: true,
-      date: new Date(currentYear.value, currentMonth.value, day)
+      date: new Date(currentYear.value, currentMonth.value, day),
     })
   }
 
@@ -303,13 +317,10 @@ const isWeekend = (cell) => {
 
 const isDayInPast = (cell) => {
   if (!cell.date) return false
-
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
-
   const cellDateStart = new Date(cell.date)
   cellDateStart.setHours(0, 0, 0, 0)
-
   return cellDateStart.getTime() < todayStart.getTime()
 }
 
@@ -328,21 +339,35 @@ watch(
   { immediate: true },
 )
 
+function clearError(field) {
+  errors.value[field] = false
+  errorMessage.value = ''
+}
+
 const cancelEditing = () => {
-  editedTitle.value = props.props?.task?.title || ''
+  editedTitle.value = props.task?.title || ''
   editedDescription.value = props.task?.description || ''
   editedStatus.value = props.task?.status || 'Без статуса'
   taskDate.value = props.task.date ? new Date(props.task.date) : new Date()
   currentYear.value = taskDate.value.getFullYear()
   currentMonth.value = taskDate.value.getMonth()
 
+  errors.value.title = false
+  errorMessage.value = ''
   isEditing.value = false
 
   emit('close')
 }
 
 const saveChanges = () => {
-  if (!editedTitle.value.trim()) return
+  errors.value.title = false
+  errorMessage.value = ''
+
+  if (!editedTitle.value) {
+    errors.value.title = true
+    errorMessage.value = 'Введите название задачи'
+    return
+  }
 
   const safeDate = new Date(taskDate.value)
   safeDate.setHours(12, 0, 0, 0)
@@ -352,16 +377,14 @@ const saveChanges = () => {
     title: editedTitle.value,
     description: editedDescription.value,
     status: editedStatus.value,
-    date: safeDate.toISOString()
+    date: safeDate.toISOString(),
   })
   isEditing.value = false
 }
 
 const getCategoryColorClass = (topicName) => {
   if (!topicName) return '_orange'
-
   const text = topicName.toLowerCase()
-
   if (text.includes('web') || text.includes('design') || text.includes('дизайн')) return '_orange'
   if (text.includes('copy') || text.includes('text') || text.includes('текст')) return '_purple'
   return '_green'
@@ -399,7 +422,7 @@ const getCategoryColorClass = (topicName) => {
   width: 100%;
   padding: 40px 30px 38px;
   border-radius: 10px;
-  border: 0.7px solid #d4dbe5;
+  border: 1px solid #d4dbe5;
   position: relative;
 }
 .pop-browse__content {
@@ -471,7 +494,7 @@ const getCategoryColorClass = (topicName) => {
 }
 .status__theme {
   border-radius: 24px;
-  border: 0.7px solid rgba(148, 166, 190, 0.4);
+  border: 1px solid rgba(148, 166, 190, 0.4);
   color: #94a6be;
   padding: 11px 14px 10px;
   cursor: pointer;
@@ -501,7 +524,7 @@ const getCategoryColorClass = (topicName) => {
   outline: none;
   padding: 14px;
   background: #eaeef6;
-  border: 0.7px solid rgba(148, 166, 190, 0.4);
+  border: 1px solid rgba(148, 166, 190, 0.4);
   border-radius: 8px;
   font-size: 14px;
   line-height: 1;
@@ -509,21 +532,13 @@ const getCategoryColorClass = (topicName) => {
   margin-top: 14px;
   height: 200px;
 }
-.form-browse__area::-moz-placeholder {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1px;
-  color: #94a6be;
-  letter-spacing: -0.14px;
-  font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
-}
 .form-browse__area::placeholder {
   font-weight: 400;
   font-size: 14px;
   line-height: 1px;
   color: #94a6be;
   letter-spacing: -0.14px;
-  font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
 .form-browse__input-title {
   font-family: 'Roboto', sans-serif;
@@ -537,10 +552,19 @@ const getCategoryColorClass = (topicName) => {
   outline: none;
   margin-bottom: 10px;
 }
+.form-browse__input-title--error {
+  border: 1px solid #f84242 !important;
+  background-color: rgba(248, 66, 66, 0.03);
+}
+.form-browse__error {
+  color: #f84242;
+  font-size: 12px;
+  margin-top: 10px;
+}
 
 ._btn-bor {
   border-radius: 4px;
-  border: 0.7px solid var(--palette-navy-60, #565eef) !important;
+  border: 1px solid #565eef;
   outline: none;
   background: transparent;
   color: #565eef;
