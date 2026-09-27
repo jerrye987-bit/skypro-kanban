@@ -1,12 +1,16 @@
 <script setup>
-defineProps({
+import { ref } from 'vue'
+
+const props = defineProps({
   task: {
     type: Object,
     required: true,
   },
 })
 
-defineEmits(['open-task'])
+const emit = defineEmits(['open-task', 'drag-start', 'drag-end'])
+
+const isDragging = ref(false)
 
 const getThemeClass = (topic) => {
   if (topic === 'Web Design') return '_orange'
@@ -18,20 +22,34 @@ const getThemeClass = (topic) => {
 const formatDateShort = (dateString) => {
   if (!dateString) return '—'
   const date = new Date(dateString)
-
   return date.toLocaleDateString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
     year: '2-digit',
   })
 }
-</script>
 
-<style lang="scss" scoped></style>
+const onDragStart = (e) => {
+  isDragging.value = true
+  e.dataTransfer.effectAllowed = 'move'
+  emit('drag-start', props.task._id)
+}
+
+const onDragEnd = () => {
+  isDragging.value = false
+  emit('drag-end')
+}
+</script>
 
 <template>
   <div class="cards__item">
-    <div class="cards__card card">
+    <div
+      class="cards__card card"
+      :class="{ 'card--dragging': isDragging }"
+      draggable="true"
+      @dragstart="onDragStart"
+      @dragend="onDragEnd"
+    >
       <div class="card__group">
         <slot name="theme">
           <div class="card__theme" :class="getThemeClass(task.topic)">
@@ -92,3 +110,11 @@ const formatDateShort = (dateString) => {
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.card--dragging {
+  opacity: 0.4;
+  transform: rotate(2deg);
+  cursor: grabbing;
+}
+</style>
