@@ -60,7 +60,9 @@ const onDrop = () => {
   min-height: 60px;
   border-radius: 10px;
   padding: 4px;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .cards--drag-over {

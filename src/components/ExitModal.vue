@@ -137,8 +137,8 @@ const { isDark, toggleTheme } = useTheme()
   width: 100%;
   max-width: 72px;
   height: 30px;
-  background: transparent;
-  color: #565eef;
+  background: #565eef;
+  color: #ffffff;
   border-radius: 4px;
   border: 1px solid #565eef;
 }
