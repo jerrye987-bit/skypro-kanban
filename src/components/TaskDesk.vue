@@ -23,6 +23,7 @@ const isBrowseOpen = ref(false)
 const selectedTask = ref(null)
 const isExitOpen = ref(false)
 const isConfirmExitOpen = ref(false)
+const draggedTaskId = ref(null)
 
 const handleLogout = () => {
   closeModals()
@@ -52,6 +53,7 @@ watch(
 const closeModals = () => {
   router.push('/')
 }
+
 // 1. Добавление задачи
 const handleAddTask = async (newTaskData) => {
   closeModals()
@@ -75,6 +77,36 @@ const currentUser = user
 onMounted(() => {
   refreshTasks()
 })
+
+// 2. Drag & Drop
+const handleDragStart = (taskId) => {
+  draggedTaskId.value = taskId
+}
+
+const handleDragEnd = () => {
+  draggedTaskId.value = null
+}
+
+const handleDropTask = async (newStatus) => {
+  if (!draggedTaskId.value) return
+
+  const task = tasks.value.find((t) => t._id === draggedTaskId.value)
+  draggedTaskId.value = null
+
+  if (!task) return
+  if (task.status === newStatus) return
+
+  // Оптимистичное обновление — мгновенно меняем статус в UI
+  task.status = newStatus
+
+  await updateTaskData(task._id, {
+    title: task.title,
+    topic: task.topic,
+    status: newStatus,
+    description: task.description,
+    date: task.date ? new Date(task.date).toISOString() : new Date().toISOString(),
+  })
+}
 
 // 3. Открытие карточки по ID
 const openTaskModal = (id) => {
@@ -113,7 +145,6 @@ const handleBasketTask = async (taskId) => {
   <div class="task-desk">
     <BaseHeader :user="currentUser" />
 
-    <!-- Баннер ошибки бэкенда. Отображается только если в errorMessage есть текст -->
     <div
       v-if="errorMessage"
       class="task-desk__error-banner"
@@ -133,9 +164,8 @@ const handleBasketTask = async (taskId) => {
       {{ errorMessage }}
     </div>
 
-    <!-- Сетка колонок проекта -->
     <main class="task-desk__grid">
-      <!-- СЦЕНАРИЙ 1: Загрузка завершена, но в массиве абсолютно пусто -->
+      <!-- Пусто -->
       <template v-if="!isLoading && tasks.length === 0">
         <div class="task-desk__empty">
           <div class="empty-content">
@@ -145,33 +175,32 @@ const handleBasketTask = async (taskId) => {
         </div>
       </template>
 
-      <!-- СЦЕНАРИЙ 2: Стандартный рабочий режим (идет загрузка или выводятся карточки) -->
+      <!-- Колонки -->
       <template v-else>
-        <!-- 1. КОЛОНКА: БЕЗ СТАТУСА -->
-        <TaskColumn>
+        <TaskColumn status="Без статуса" @drop-task="handleDropTask">
           <template #title>БЕЗ СТАТУСА</template>
           <template #content>
             <template v-if="isLoading">
               <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
             </template>
             <template v-else>
-              <!-- Передаем объект задачи целиком в проп :task и слушаем событие @open-task -->
               <Task
                 v-for="task in tasks.filter((t) => t.status === 'Без статуса')"
                 :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
+                @drag-start="handleDragStart"
+                @drag-end="handleDragEnd"
               />
             </template>
           </template>
         </TaskColumn>
 
-        <!-- 2. КОЛОНКА: НУЖНО СДЕЛАТЬ -->
-        <TaskColumn>
+        <TaskColumn status="Нужно сделать" @drop-task="handleDropTask">
           <template #title>НУЖНО СДЕЛАТЬ</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk2-' + n" />
             </template>
             <template v-else>
               <Task
@@ -179,17 +208,18 @@ const handleBasketTask = async (taskId) => {
                 :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
+                @drag-start="handleDragStart"
+                @drag-end="handleDragEnd"
               />
             </template>
           </template>
         </TaskColumn>
 
-        <!-- 3. КОЛОНКА: В РАБОТЕ -->
-        <TaskColumn>
+        <TaskColumn status="В работе" @drop-task="handleDropTask">
           <template #title>В РАБОТЕ</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk3-' + n" />
             </template>
             <template v-else>
               <Task
@@ -197,17 +227,18 @@ const handleBasketTask = async (taskId) => {
                 :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
+                @drag-start="handleDragStart"
+                @drag-end="handleDragEnd"
               />
             </template>
           </template>
         </TaskColumn>
 
-        <!-- 4. КОЛОНКА: ТЕСТИРОВАНИЕ -->
-        <TaskColumn>
+        <TaskColumn status="Тестирование" @drop-task="handleDropTask">
           <template #title>ТЕСТИРОВАНИЕ</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk4-' + n" />
             </template>
             <template v-else>
               <Task
@@ -215,17 +246,18 @@ const handleBasketTask = async (taskId) => {
                 :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
+                @drag-start="handleDragStart"
+                @drag-end="handleDragEnd"
               />
             </template>
           </template>
         </TaskColumn>
 
-        <!-- 5. КОЛОНКА: ГОТОВО -->
-        <TaskColumn>
+        <TaskColumn status="Готово" @drop-task="handleDropTask">
           <template #title>ГОТОВО</template>
           <template #content>
             <template v-if="isLoading">
-              <TaskSkeleton v-for="n in 3" :key="'sk1-' + n" />
+              <TaskSkeleton v-for="n in 3" :key="'sk5-' + n" />
             </template>
             <template v-else>
               <Task
@@ -233,6 +265,8 @@ const handleBasketTask = async (taskId) => {
                 :key="task._id"
                 :task="task"
                 @open-task="openTaskModal"
+                @drag-start="handleDragStart"
+                @drag-end="handleDragEnd"
               />
             </template>
           </template>

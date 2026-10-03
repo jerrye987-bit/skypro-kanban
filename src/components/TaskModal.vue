@@ -566,8 +566,8 @@ const getCategoryColorClass = (topicName) => {
   border-radius: 4px;
   border: 1px solid #565eef;
   outline: none;
-  background: transparent;
-  color: #565eef;
+  background: #565eef;
+  color: #ffffff;
 }
 ._btn-bor a {
   color: #565eef;

@@ -188,7 +188,7 @@ async function handleSubmit() {
   height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
-  background-color: #EAEEF6;
+  background-color: #eaeef6;
 }
 
 .container-signup {
@@ -211,12 +211,12 @@ async function handleSubmit() {
 .modal__block {
   display: block;
   margin: 0 auto;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   max-width: 368px;
   width: 100%;
   padding: 50px 60px;
   border-radius: 10px;
-  border: 1px solid #D4DBE5;
+  border: 1px solid #d4dbe5;
   box-shadow: 0px 4px 67px -12px rgba(0, 0, 0, 0.13);
 }
 .modal__ttl h2 {
@@ -254,15 +254,15 @@ async function handleSubmit() {
   font-size: 14px;
   line-height: 21px;
   letter-spacing: -0.28px;
-  color: #94A6BE;
+  color: #94a6be;
 }
 .modal__input--error {
-  border-color: #FF6D6D !important;
+  border-color: #ff6d6d !important;
 }
 .modal__btn-signup-ent {
   width: 100%;
   height: 30px;
-  background-color: #565EEF;
+  background-color: #565eef;
   border-radius: 4px;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -275,7 +275,7 @@ async function handleSubmit() {
   line-height: 21px;
   font-weight: 500;
   letter-spacing: -0.14px;
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
 }
 .modal__form-group {
@@ -283,7 +283,7 @@ async function handleSubmit() {
 }
 .modal__form-group p,
 .modal__form-group a {
-  color: #94A6BE;
+  color: #94a6be;
   font-size: 14px;
   font-weight: 400;
   line-height: 150%;
@@ -293,10 +293,10 @@ async function handleSubmit() {
   text-decoration: underline;
 }
 .link-inline {
-  color: #565EEF;
+  color: #565eef;
 }
 .modal__error {
-  color: #FF6D6D;
+  color: #ff6d6d;
   font-size: 14px;
   line-height: 21px;
   margin-bottom: 10px;
@@ -322,29 +322,29 @@ async function handleSubmit() {
   background-color: #151419;
 }
 [data-theme='dark'] .modal__block {
-  background-color: #20202C;
-  border: 1px solid #4E5566;
+  background-color: #20202c;
+  border: 1px solid #4e5566;
   box-shadow: 0px 4px 67px -12px rgba(0, 0, 0, 0.4);
 }
 [data-theme='dark'] .modal__ttl h2 {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 [data-theme='dark'] .modal__input {
   background: #151419;
-  color: #FFFFFF;
+  color: #ffffff;
   border: 1px solid rgba(148, 166, 190, 0.4);
 }
 [data-theme='dark'] .modal__input::placeholder {
-  color: #94A6BE;
+  color: #94a6be;
 }
 [data-theme='dark'] .modal__form-group p {
-  color: #94A6BE;
+  color: #94a6be;
 }
 [data-theme='dark'] .modal__form-group a,
 [data-theme='dark'] .link-inline {
-  color: #565EEF;
+  color: #565eef;
 }
 [data-theme='dark'] .modal__error {
-  color: #FF6D6D;
+  color: #ff6d6d;
 }
 </style>

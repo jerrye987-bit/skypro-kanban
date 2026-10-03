@@ -92,18 +92,18 @@ defineEmits(['close', 'confirm'])
 
 <style lang="scss">
 [data-theme='dark'] .pop-exit__block {
-  background-color: #20202C !important;
-  border: 1px solid #4E5566 !important;
+  background-color: #20202c !important;
+  border: 1px solid #4e5566 !important;
   box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.4) !important;
 }
 [data-theme='dark'] .pop-exit__ttl h2 {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 [data-theme='dark'] .pop-exit__exit-no {
-  border: 1px solid #FFFFFF !important;
-  color: #FFFFFF !important;
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important;
 }
 [data-theme='dark'] .pop-exit__exit-no a {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 </style>
